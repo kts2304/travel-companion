@@ -1,0 +1,82 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}{\f1 Calibri Light;}}
+\viewkind4\uc1\pard\sa120\sl276\slmult1\lang1033\f1\fs40\b Travel Companion V1\par
+\f0\fs24\b0 CEO Pitch Document\par
+\par
+\b Executive Summary\par
+\b0 Travel Companion V1 is a functional, production-ready foundation for group trip expense management. Users can create trips, add members, record expenses, split costs, and view settlement outcomes instantly.\par
+V1 solves the core trust problem in shared spending: everyone can see exactly who paid, who consumed, and who owes whom.\par
+\par
+\b Problem We Are Solving\par
+\b0 Group travel spending is usually tracked in chats or spreadsheets, creating confusion, delayed settlements, and social friction. V1 provides a single source of truth with transparent calculations and clear final settlement lines.\par
+\par
+\b What We Shipped in V1\par
+\b0 1. Trip lifecycle: create and manage trips.\par
+2. Member management: add participants quickly.\par
+3. Expense capture: log payer, amount, date, and split participants.\par
+4. Equal split engine: deterministic split calculations with rounding safety.\par
+5. Balance engine: paid/share/net computation per member.\par
+6. Settlement engine: optimized debtor-to-creditor settlement outputs.\par
+7. Day-wise + overall summaries for better spend visibility.\par
+8. Expense edit/delete support for correction workflows.\par
+\par
+\b Business Value\par
+\b0 - Faster trip settlement cycles.\par
+- Higher user trust via transparent and reproducible math.\par
+- Lower conflict in group finances through clear accountability.\par
+- Strong platform base for monetizable premium capabilities in V2/V3.\par
+\par
+\b Product Experience Highlights\par
+\b0 - Minimal, clean UI focused on speed of entry.\par
+- Bright visual design with clear hierarchy.\par
+- Form validation to reduce bad inputs.\par
+- Immediate data refresh after create/update/delete actions.\par
+\par
+\b Technical Architecture\par
+\b0 - Frontend: Next.js App Router + TypeScript (strict mode).\par
+- Backend: Supabase PostgreSQL.\par
+- Validation + forms: zod + react-hook-form.\par
+- Layered design: UI \u8594{} Services \u8594{} Supabase client \u8594{} DB.\par
+- All DB queries are isolated in service layer to keep UI clean and maintainable.\par
+\par
+\b Data Model (Core)\par
+\b0 - trips\par
+- members (trip-scoped)\par
+- expenses (trip-scoped, payer, amount, date)\par
+- expense_splits (member-level owed rows)\par
+\par
+\b Quality and Reliability\par
+\b0 - Split math tests are implemented and passing.\par
+- Build, lint, and runtime flows are validated.\par
+- Migration + seed scripts available for reproducible setup.\par
+\par
+\b Key Decision in V1\par
+\b0 Settlement follows net accounting:\par
+Net = Paid - Share\par
+Then debtors pay creditors until all nets reach zero.\par
+This mirrors expected behavior in mature split apps and scales cleanly with complex trips.\par
+\par
+\b Risks / Known Constraints\par
+\b0 - No authentication or role-based access control in V1.\par
+- Equal-split-first model; advanced split modes are future scope.\par
+- No receipts/OCR and no notifications yet.\par
+\par
+\b V2 Recommendations\par
+\b0 1. Authentication + trip access controls.\par
+2. Advanced splits (percent, exact amount, unequal shares).\par
+3. Personal expense toggle and richer split presets.\par
+4. Analytics layer: who paid most, spend by day/category.\par
+5. Export/share settlement summary (PDF/WhatsApp-ready).\par
+\par
+\b V3 Direction\par
+\b0 - Real-time collaboration.\par
+- Multi-currency support with conversion history.\par
+- Receipt capture, OCR, and automated categorization.\par
+- Team/organization travel workspace.\par
+\par
+\b Ask from CEO\par
+\b0 Approve progression from V1 to V2 with focus on authentication, advanced split options, and shareable settlement outputs. These three additions materially improve trust, retention, and monetization readiness.\par
+\par
+\b Conclusion\par
+\b0 V1 has successfully de-risked the core product thesis: users can record shared trip expenses and settle transparently with minimal friction. The foundation is stable, extensible, and ready for growth-stage feature investment.\par
+}
