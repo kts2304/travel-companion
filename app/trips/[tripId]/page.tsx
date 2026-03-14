@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BookingsTab } from "@/components/trip/BookingsTab";
+import { TripInsightsPanel } from "@/components/trip/TripInsightsPanel";
 import { TripTabs } from "@/components/trip/TripTabs";
+import { TripWorkspaceSidebar } from "@/components/trip/TripWorkspaceSidebar";
 import { calculateMemberBalances, calculateSettlements } from "@/lib/calculations/splitExpense";
 import { getExpenseSplitsByTrip, getExpensesByTrip } from "@/services/expenseService";
 import { getMembersByTrip } from "@/services/memberService";
@@ -19,16 +21,6 @@ interface DayWiseSummary {
   date: string;
   memberBalances: ReturnType<typeof calculateMemberBalances>;
   settlements: ReturnType<typeof calculateSettlements>;
-}
-
-function getNetText(balance: number): string {
-  if (balance > 0) {
-    return `Gets back Rs ${balance.toFixed(2)}`;
-  }
-  if (balance < 0) {
-    return `Owes Rs ${Math.abs(balance).toFixed(2)}`;
-  }
-  return "Settled up";
 }
 
 export default async function TripDetailsPage({ params }: TripDetailsPageProps) {
@@ -89,96 +81,47 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
   });
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10">
-      <div className="rounded-3xl border border-white/70 bg-white/90 p-7 shadow-xl">
-        <h1 className="text-4xl font-bold text-slate-900">{trip.name}</h1>
-        {trip.destination && <p className="mt-1 text-slate-600">{trip.destination}</p>}
-
-        <div className="mt-6 flex flex-wrap gap-3 text-sm">
-          <Link href="/" className="rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:bg-slate-200">
-            Back home
+    <main className="min-h-screen px-4 py-6 sm:px-6 xl:px-8">
+      <div className="mx-auto max-w-[1500px]">
+        <div className="mb-5 flex items-center justify-between gap-4 rounded-[28px] border border-slate-700/90 bg-[#020b16]/95 px-5 py-4 shadow-[0_30px_80px_rgba(1,6,17,0.55)] backdrop-blur">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+              Travel Companion
+            </p>
+            <p className="mt-1 text-sm text-slate-300">
+              Trip workspace for members, expenses, bookings, and settlement visibility
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-cyan-400/60 hover:text-white"
+          >
+            Exit workspace
           </Link>
         </div>
 
-        <section className="mt-8 rounded-2xl border border-sky-200 bg-sky-50/80 p-4">
-          <h2 className="text-xl font-semibold text-slate-900">Overall summary (Splitwise style)</h2>
-          <p className="mt-1 text-xs text-slate-600">Paid | Share | Net (Net = Paid - Share)</p>
-          <div className="mt-3 space-y-2">
-            {memberBalances.length === 0 && <p className="text-sm text-slate-600">No members yet.</p>}
-            {memberBalances.map((memberBalance) => (
-              <p key={memberBalance.memberId} className="text-sm text-slate-700">
-                {memberBalance.memberName}: Paid Rs {memberBalance.totalPaid.toFixed(2)} | Share Rs{" "}
-                {memberBalance.totalOwed.toFixed(2)} | Net Rs {memberBalance.balance.toFixed(2)} |{" "}
-                {getNetText(memberBalance.balance)}
-              </p>
-            ))}
-          </div>
-        </section>
+        <div className="grid gap-5 xl:grid-cols-[260px_minmax(0,1fr)_360px]">
+          <TripWorkspaceSidebar
+            trip={trip}
+            memberCount={members.length}
+            expenseCount={expenses.length}
+          />
 
-        <section className="mt-8 rounded-2xl border border-cyan-200 bg-cyan-50/80 p-4">
-          <h2 className="text-xl font-semibold text-slate-900">Overall settlements</h2>
-          <div className="mt-3 space-y-2">
-            {settlements.length === 0 && (
-              <p className="text-sm text-slate-600">No outstanding balances.</p>
-            )}
-            {settlements.map((settlement, index) => (
-              <p key={`${settlement.fromMemberId}-${settlement.toMemberId}-${index}`} className="text-sm text-slate-700">
-                {memberLabelById.get(settlement.fromMemberId) ?? settlement.fromMemberName} owes{" "}
-                {memberLabelById.get(settlement.toMemberId) ?? settlement.toMemberName} Rs{" "}
-                {settlement.amount.toFixed(2)}
-              </p>
-            ))}
-          </div>
-        </section>
+          <TripTabs
+            tripId={tripId}
+            members={members}
+            expenses={expenses}
+            expenseSplits={expenseSplits}
+            bookingsContent={<BookingsTab tripId={tripId} members={members} />}
+          />
 
-        <section className="mt-8">
-          <h2 className="text-xl font-semibold text-slate-900">Day-wise summary</h2>
-          {dayWiseSummaries.length === 0 ? (
-            <p className="mt-3 text-sm text-slate-600">No expenses added yet.</p>
-          ) : (
-            <div className="mt-4 space-y-5">
-              {dayWiseSummaries.map((summary) => (
-                <div key={summary.date} className="rounded-2xl border border-amber-200 bg-amber-50/80 p-4">
-                  <h3 className="text-lg font-semibold text-slate-900">{summary.date}</h3>
-                  <p className="mt-1 text-xs text-slate-600">Paid | Share | Net</p>
-                  <div className="mt-2 space-y-1">
-                    {summary.memberBalances.map((memberBalance) => (
-                      <p key={`${summary.date}-${memberBalance.memberId}`} className="text-sm text-slate-700">
-                        {memberBalance.memberName}: Paid Rs {memberBalance.totalPaid.toFixed(2)} | Share Rs{" "}
-                        {memberBalance.totalOwed.toFixed(2)} | Net Rs {memberBalance.balance.toFixed(2)} |{" "}
-                        {getNetText(memberBalance.balance)}
-                      </p>
-                    ))}
-                  </div>
-                  <div className="mt-3 space-y-1">
-                    {summary.settlements.length === 0 ? (
-                      <p className="text-sm text-slate-600">No settlement needed for this day.</p>
-                    ) : (
-                      summary.settlements.map((settlement, index) => (
-                      <p
-                          key={`${summary.date}-${settlement.fromMemberId}-${settlement.toMemberId}-${index}`}
-                          className="text-sm text-slate-700"
-                        >
-                          {memberLabelById.get(settlement.fromMemberId) ?? settlement.fromMemberName} owes{" "}
-                          {memberLabelById.get(settlement.toMemberId) ?? settlement.toMemberName} Rs{" "}
-                          {settlement.amount.toFixed(2)}
-                        </p>
-                      ))
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <TripTabs
-          tripId={tripId}
-          members={members}
-          expenses={expenses}
-          expenseSplits={expenseSplits}
-          bookingsContent={<BookingsTab tripId={tripId} />}
-        />
+          <TripInsightsPanel
+            memberBalances={memberBalances}
+            settlements={settlements}
+            dayWiseSummaries={dayWiseSummaries}
+            memberLabelById={memberLabelById}
+          />
+        </div>
       </div>
     </main>
   );

@@ -14,7 +14,7 @@ export function ExpensesTab({ tripId, members, expenses, expenseSplits }: Expens
   return (
     <div className="space-y-6">
       {members.length === 0 ? (
-        <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+        <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-100">
           Add members before creating expenses.
         </p>
       ) : (
@@ -22,7 +22,7 @@ export function ExpensesTab({ tripId, members, expenses, expenseSplits }: Expens
       )}
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">Expense history</h3>
+        <h3 className="text-lg font-semibold text-white">Expense history</h3>
         <ManageExpensesList expenses={expenses} members={members} expenseSplits={expenseSplits} />
       </section>
     </div>

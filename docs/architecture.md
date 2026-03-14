@@ -1,4 +1,4 @@
-# Travel Companion V1 Architecture
+# Travel Companion Architecture
 
 ## Overview
 Travel Companion is a Next.js App Router application with Supabase PostgreSQL as the backend datastore.
@@ -31,3 +31,12 @@ Travel Companion is a Next.js App Router application with Supabase PostgreSQL as
 - `TripTabs` controls the active section: Members, Expenses, Bookings
 - Bookings are managed through a dedicated service and shown as a date-sorted timeline
 - The modular tab structure keeps each section isolated while preserving a single trip dashboard experience
+
+## V2.1 Personal Travel Layer
+- `bookings` now supports `scope` (`shared` or `personal`) and optional `member_id`
+- Shared bookings cover trip-wide plans such as hotels, activities, and shared transport
+- Personal bookings cover traveler-specific tickets such as flights and bus travel
+- The Bookings tab renders both:
+  - a shared trip timeline for group items
+  - a `My Travel` panel that resolves the signed-in Supabase user against `members.email`
+- Booking documents remain attached to the booking, so personal flight or bus files stay scoped to that traveler view

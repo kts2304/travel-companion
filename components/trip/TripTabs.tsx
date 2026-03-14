@@ -33,35 +33,48 @@ export function TripTabs({
   const [activeTab, setActiveTab] = useState<TabKey>("members");
 
   return (
-    <section className="mt-8 rounded-3xl border border-white/70 bg-white/90 p-6 shadow-xl">
-      <div className="flex flex-wrap gap-3">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            onClick={() => setActiveTab(tab.key)}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              activeTab === tab.key
-                ? "bg-slate-900 text-white shadow-md"
-                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <section className="rounded-[28px] border border-slate-700/90 bg-[#020b16]/95 shadow-[0_30px_80px_rgba(1,6,17,0.55)] backdrop-blur">
+      <div className="border-b border-slate-800 px-5 py-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+          Trip Container
+        </p>
       </div>
 
-      <div className="mt-6">
-        {activeTab === "members" && <MembersTab tripId={tripId} members={members} />}
-        {activeTab === "expenses" && (
-          <ExpensesTab
-            tripId={tripId}
-            members={members}
-            expenses={expenses}
-            expenseSplits={expenseSplits}
-          />
-        )}
-        {activeTab === "bookings" && bookingsContent}
+      <div className="grid min-h-[720px] lg:grid-cols-[220px_minmax(0,1fr)]">
+        <div className="border-b border-slate-800 p-4 lg:border-r lg:border-b-0">
+          <div className="space-y-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                  activeTab === tab.key
+                    ? "bg-cyan-500/15 text-cyan-200 shadow-[inset_0_0_0_1px_rgba(34,211,238,0.25)]"
+                    : "bg-slate-900/70 text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span className="text-xs text-slate-500">
+                  {tab.key === "members" ? members.length : tab.key === "expenses" ? expenses.length : "new"}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-5">
+          {activeTab === "members" && <MembersTab tripId={tripId} members={members} />}
+          {activeTab === "expenses" && (
+            <ExpensesTab
+              tripId={tripId}
+              members={members}
+              expenses={expenses}
+              expenseSplits={expenseSplits}
+            />
+          )}
+          {activeTab === "bookings" && bookingsContent}
+        </div>
       </div>
     </section>
   );

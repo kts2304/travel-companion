@@ -1,4 +1,4 @@
-# Database Design (V1)
+# Database Design
 
 Schema file: `db/migrations/init_schema.sql`  
 Seed files:
@@ -24,7 +24,12 @@ Seed files:
 - `bookings`
   - `id` UUID PK
   - `trip_id` FK -> `trips.id` (`on delete cascade`)
-  - `type`, `title`, `start_date`, `end_date`, `notes`
+  - `type`, `scope`, `member_id`, `title`, `start_date`, `end_date`, `notes`
+  - `created_at`
+- `booking_documents`
+  - `id` UUID PK
+  - `booking_id` FK -> `bookings.id` (`on delete cascade`)
+  - `file_url`
   - `created_at`
 - `expense_splits`
   - `id` UUID PK
@@ -38,7 +43,9 @@ Seed files:
 - One `trip` has many `members`
 - One `trip` has many `expenses`
 - One `trip` has many `bookings`
+- One `member` can have many personal `bookings`
 - One `expense` has many `expense_splits`
+- One `booking` has many `booking_documents`
 
 ## Constraints
 - UUID primary keys on every table
@@ -46,8 +53,16 @@ Seed files:
 - Cascading deletes applied where child records should be removed automatically
 - Day-wise granularity is enabled through `expenses.expense_date`
 - V2 trip container data is extended through `bookings` for itinerary timeline support
+- `bookings.scope` separates group items from traveler-specific tickets
+- `bookings.member_id` links personal bookings to a trip member
+- `v2_personalize_bookings.sql` adds cross-trip validation so a personal booking can only point to a member from the same trip
 
 ## Demo Seeds
 - To reset data only: run `db/migrations/reset_all_data.sql`
 - To load basic sample: run `db/seed/seed_data.sql`
 - To demo multiple creditors in settlements: run `db/seed/seed_multi_creditor.sql`
+
+## Booking Migrations
+- `db/migrations/v2_add_bookings.sql`
+- `db/migrations/v2_add_booking_documents.sql`
+- `db/migrations/v2_personalize_bookings.sql`

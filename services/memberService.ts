@@ -2,17 +2,21 @@ import { supabase } from "@/lib/supabaseClient";
 import type { AddMemberInput, Member } from "@/types/member";
 
 export async function addMember(tripId: string, input: AddMemberInput): Promise<Member> {
+  const normalizedName = input.name.trim();
   const { data, error } = await supabase
     .from("members")
     .insert({
       trip_id: tripId,
-      name: input.name,
+      name: normalizedName,
       email: input.email?.trim() || null,
     })
     .select("*")
     .single();
 
   if (error) {
+    if (error.code === "23505") {
+      throw new Error("This member already exists in the trip.");
+    }
     throw new Error(error.message);
   }
 

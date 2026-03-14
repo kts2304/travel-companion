@@ -17,6 +17,9 @@ create table if not exists members (
   created_at timestamptz not null default now()
 );
 
+create unique index if not exists members_trip_id_name_unique
+on members (trip_id, lower(trim(name)));
+
 create table if not exists expenses (
   id uuid primary key default gen_random_uuid(),
   trip_id uuid not null references trips(id) on delete cascade,

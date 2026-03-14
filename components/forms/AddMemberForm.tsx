@@ -45,24 +45,34 @@ export function AddMemberForm({ tripId }: AddMemberFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      autoComplete="off"
+      className="space-y-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-5 shadow-[0_20px_60px_rgba(1,6,17,0.28)]"
+    >
       <div className="space-y-1">
-        <label htmlFor="member-name" className="block text-sm font-medium">
+        <label htmlFor="member-name" className="block text-sm font-medium text-slate-100">
           Member name
         </label>
-        <input id="member-name" {...register("name")} className="w-full rounded-xl border border-slate-300 p-2.5 outline-none ring-cyan-300 focus:ring-2" />
+        <input
+          id="member-name"
+          {...register("name")}
+          autoComplete="off"
+          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
+        />
         {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="member-email" className="block text-sm font-medium">
+        <label htmlFor="member-email" className="block text-sm font-medium text-slate-100">
           Email (optional)
         </label>
         <input
           id="member-email"
           type="email"
           {...register("email")}
-          className="w-full rounded-xl border border-slate-300 p-2.5 outline-none ring-cyan-300 focus:ring-2"
+          autoComplete="off"
+          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
         />
         {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
       </div>
