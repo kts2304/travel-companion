@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AuthStatus } from "@/components/auth/AuthStatus";
 import { BookingsTab } from "@/components/trip/BookingsTab";
 import { TripInsightsPanel } from "@/components/trip/TripInsightsPanel";
 import { TripTabs } from "@/components/trip/TripTabs";
@@ -92,12 +93,15 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
               Trip workspace for members, expenses, bookings, and settlement visibility
             </p>
           </div>
-          <Link
-            href="/"
-            className="rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-cyan-400/60 hover:text-white"
-          >
-            Exit workspace
-          </Link>
+          <div className="flex flex-wrap items-center justify-end gap-3">
+            <AuthStatus />
+            <Link
+              href="/"
+              className="rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-cyan-400/60 hover:text-white"
+            >
+              Exit workspace
+            </Link>
+          </div>
         </div>
 
         <div className="grid gap-5 xl:grid-cols-[260px_minmax(0,1fr)_360px]">
@@ -112,7 +116,14 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
             members={members}
             expenses={expenses}
             expenseSplits={expenseSplits}
-            bookingsContent={<BookingsTab tripId={tripId} members={members} />}
+            bookingsContent={
+              <BookingsTab
+                tripId={tripId}
+                members={members}
+                tripStartDate={trip.start_date}
+                tripEndDate={trip.end_date}
+              />
+            }
           />
 
           <TripInsightsPanel

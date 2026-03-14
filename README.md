@@ -147,3 +147,16 @@ npm run dev
 Then open:
 
 http://localhost:3000
+
+## App Authentication
+
+Travel Companion now supports app-side authentication using Supabase Auth.
+
+Supported sign-in methods in the UI:
+
+* Email + password
+* GitHub OAuth
+
+For GitHub sign-in, enable the GitHub provider in Supabase Auth and add this callback URL:
+
+`http://localhost:3000/auth/callback`

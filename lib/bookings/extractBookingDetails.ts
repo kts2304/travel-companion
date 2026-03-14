@@ -17,6 +17,17 @@ export interface ExtractedBookingDetails {
   endDate: string;
   notes: string;
   rawText: string;
+  hotelName: string;
+  roomNumber: string;
+  place: string;
+  onwardFlightNumber: string;
+  onwardDepartureAt: string;
+  onwardSeatNumber: string;
+  onwardPnr: string;
+  returnFlightNumber: string;
+  returnDepartureAt: string;
+  returnSeatNumber: string;
+  returnPnr: string;
 }
 
 function toDateTimeLocal(date: Date): string {
@@ -58,9 +69,12 @@ function detectBookingType(text: string): BookingType {
 function extractCandidateDates(text: string): Date[] {
   const candidates = new Set<string>();
   const patterns = [
+    /\b\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}\b/g,
+    /\b\d{2}[/-]\d{2}[/-]\d{4}\s+\d{2}:\d{2}\b/g,
     /\b\d{4}-\d{2}-\d{2}\b/g,
     /\b\d{2}[/-]\d{2}[/-]\d{4}\b/g,
     /\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\b/gi,
+    /\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+\d{1,2},?\s+\d{4}\s+\d{1,2}:\d{2}\b/gi,
   ];
 
   for (const pattern of patterns) {
@@ -72,8 +86,11 @@ function extractCandidateDates(text: string): Date[] {
 
   return Array.from(candidates)
     .map((candidate) => {
-      const normalized = /^\d{2}[/-]\d{2}[/-]\d{4}$/.test(candidate)
-        ? candidate.replace(/(\d{2})[/-](\d{2})[/-](\d{4})/, "$3-$2-$1")
+      const normalized = /^\d{2}[/-]\d{2}[/-]\d{4}(?:\s+\d{2}:\d{2})?$/.test(candidate)
+        ? candidate.replace(
+            /(\d{2})[/-](\d{2})[/-](\d{4})(?:\s+(\d{2}:\d{2}))?/,
+            (_match, day, month, year, time) => `${year}-${month}-${day}${time ? `T${time}` : ""}`,
+          )
         : candidate;
       return new Date(normalized);
     })
@@ -105,6 +122,88 @@ function extractTitle(text: string, type: BookingType): string {
 
 function normalizeRawText(text: string): string {
   return text.replace(/\s+/g, " ").trim();
+}
+
+function extractFirstMatch(text: string, pattern: RegExp): string {
+  const match = text.match(pattern);
+  return match?.[1]?.trim() ?? "";
+}
+
+function extractAllMatches(text: string, pattern: RegExp): string[] {
+  return Array.from(text.matchAll(pattern)).map((match) => match[1]?.trim() ?? "").filter(Boolean);
+}
+
+function normalizeFlightToken(value: string): string {
+  return value.replace(/\s+/g, "").toUpperCase();
+}
+
+function extractFlightDetails(rawText: string): Omit<
+  ExtractedBookingDetails,
+  "type" | "title" | "startDate" | "endDate" | "notes" | "rawText" | "hotelName" | "roomNumber" | "place"
+> {
+  const airlineFlightMatches = extractAllMatches(
+    rawText,
+    /\b((?:6E|AI|UK|SG|I5|QP|IX|G8)\s?\d{1,4})\b/gi,
+  ).map(normalizeFlightToken);
+  const labeledFlightMatches = extractAllMatches(
+    rawText,
+    /\b(?:flight|flt)\s*(?:no|number|#)?[:\s-]*([A-Z0-9]{2,10})/gi,
+  ).map(normalizeFlightToken);
+  const allFlightMatches = Array.from(new Set([...airlineFlightMatches, ...labeledFlightMatches]));
+  const allSeatMatches = Array.from(
+    new Set([
+      ...extractAllMatches(rawText, /\bseat\s*(?:no|number|#)?[:\s-]*([A-Z0-9]{1,4})/gi),
+      ...extractAllMatches(rawText, /\b(\d{1,2}[A-F])\b/g),
+    ]),
+  );
+  const allPnrMatches = Array.from(
+    new Set(
+      extractAllMatches(
+        rawText,
+        /\b(?:pnr|booking reference|booking number|reservation code|ref)\s*[:\s-]*([A-Z0-9]{5,12})/gi,
+      ),
+    ),
+  );
+  const dates = extractCandidateDates(rawText).map((date) => toDateTimeLocal(date));
+
+  return {
+    onwardFlightNumber: allFlightMatches[0] ?? "",
+    onwardDepartureAt: dates[0] ?? "",
+    onwardSeatNumber: allSeatMatches[0] ?? "",
+    onwardPnr: allPnrMatches[0] ?? "",
+    returnFlightNumber: allFlightMatches[1] ?? "",
+    returnDepartureAt: dates[1] ?? "",
+    returnSeatNumber: allSeatMatches[1] ?? "",
+    returnPnr: allPnrMatches[1] ?? "",
+  };
+}
+
+function extractHotelDetails(
+  rawText: string,
+  title: string,
+): Pick<ExtractedBookingDetails, "hotelName" | "roomNumber" | "place"> {
+  const lines = rawText
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const hotelName =
+    extractFirstMatch(rawText, /\b(?:hotel|property|stay at)\s*[:\s-]*([A-Za-z0-9 .&'-]{3,80})/i) ||
+    lines.find((line) => /(hotel|resort|inn|suites|villa)/i.test(line)) ||
+    title;
+  const roomNumber = extractFirstMatch(
+    rawText,
+    /\b(?:room|room no|room number|rm)\s*[:#\s-]*([A-Z0-9-]{1,10})/i,
+  );
+  const place =
+    extractFirstMatch(rawText, /\b(?:address|location|city|place)\s*[:\s-]*([A-Za-z0-9, .-]{3,80})/i) ||
+    lines.find((line) => /(road|street|nagar|city|goa|delhi|mumbai|bengaluru|bangalore|hyderabad|jaipur|udupi|mysuru|mysore)/i.test(line)) ||
+    "";
+
+  return {
+    hotelName: hotelName.trim(),
+    roomNumber,
+    place: place.trim(),
+  };
 }
 
 async function runOcr(image: string | HTMLCanvasElement): Promise<string> {
@@ -209,6 +308,27 @@ function buildExtractedBookingDetails(rawText: string): ExtractedBookingDetails 
   const startDate = dates[0] ? toDateTimeLocal(dates[0]) : "";
   const endDate = dates[1] ? toDateTimeLocal(dates[1]) : "";
   const notes = rawText.slice(0, 500);
+  const hotelDetails =
+    type === "hotel"
+      ? extractHotelDetails(rawText, title)
+      : {
+          hotelName: "",
+          roomNumber: "",
+          place: "",
+        };
+  const flightDetails =
+    type === "flight"
+      ? extractFlightDetails(rawText)
+      : {
+          onwardFlightNumber: "",
+          onwardDepartureAt: "",
+          onwardSeatNumber: "",
+          onwardPnr: "",
+          returnFlightNumber: "",
+          returnDepartureAt: "",
+          returnSeatNumber: "",
+          returnPnr: "",
+        };
 
   return {
     type,
@@ -217,6 +337,8 @@ function buildExtractedBookingDetails(rawText: string): ExtractedBookingDetails 
     endDate,
     notes,
     rawText,
+    ...hotelDetails,
+    ...flightDetails,
   };
 }
 

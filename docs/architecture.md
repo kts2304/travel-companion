@@ -40,3 +40,9 @@ Travel Companion is a Next.js App Router application with Supabase PostgreSQL as
   - a shared trip timeline for group items
   - a `My Travel` panel that resolves the signed-in Supabase user against `members.email`
 - Booking documents remain attached to the booking, so personal flight or bus files stay scoped to that traveler view
+
+## V2.2 App Auth
+- App-side auth is handled through a dedicated auth service in `services/authService.ts`
+- The homepage includes sign-in and sign-up flows for email/password and GitHub OAuth
+- The GitHub OAuth callback returns to `app/auth/callback/page.tsx`
+- Trip pages surface the active session so the current signed-in email is visible while testing personal travel flows
