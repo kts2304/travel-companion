@@ -21,6 +21,11 @@ Seed files:
   - `paid_by_member_id` FK -> `members.id`
   - `description`, `total_amount`, `expense_date`
   - `created_at`
+- `bookings`
+  - `id` UUID PK
+  - `trip_id` FK -> `trips.id` (`on delete cascade`)
+  - `type`, `title`, `start_date`, `end_date`, `notes`
+  - `created_at`
 - `expense_splits`
   - `id` UUID PK
   - `expense_id` FK -> `expenses.id` (`on delete cascade`)
@@ -32,6 +37,7 @@ Seed files:
 ## Relationships
 - One `trip` has many `members`
 - One `trip` has many `expenses`
+- One `trip` has many `bookings`
 - One `expense` has many `expense_splits`
 
 ## Constraints
@@ -39,6 +45,7 @@ Seed files:
 - Positive amount checks for `expenses.total_amount` and `expense_splits.owed_amount`
 - Cascading deletes applied where child records should be removed automatically
 - Day-wise granularity is enabled through `expenses.expense_date`
+- V2 trip container data is extended through `bookings` for itinerary timeline support
 
 ## Demo Seeds
 - To reset data only: run `db/migrations/reset_all_data.sql`

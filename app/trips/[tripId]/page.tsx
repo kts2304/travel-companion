@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BookingsTab } from "@/components/trip/BookingsTab";
+import { TripTabs } from "@/components/trip/TripTabs";
 import { calculateMemberBalances, calculateSettlements } from "@/lib/calculations/splitExpense";
 import { getExpenseSplitsByTrip, getExpensesByTrip } from "@/services/expenseService";
 import { getMembersByTrip } from "@/services/memberService";
@@ -93,17 +95,8 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
         {trip.destination && <p className="mt-1 text-slate-600">{trip.destination}</p>}
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
-          <Link
-            href={`/trips/${tripId}/members`}
-            className="rounded-xl bg-cyan-600 px-4 py-2 font-semibold text-white shadow-md transition hover:bg-cyan-700"
-          >
-            Manage members
-          </Link>
-          <Link
-            href={`/trips/${tripId}/expenses`}
-            className="rounded-xl bg-amber-500 px-4 py-2 font-semibold text-slate-900 shadow-md transition hover:bg-amber-400"
-          >
-            Manage expenses
+          <Link href="/" className="rounded-xl bg-slate-100 px-4 py-2 font-semibold text-slate-700 transition hover:bg-slate-200">
+            Back home
           </Link>
         </div>
 
@@ -178,6 +171,14 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
             </div>
           )}
         </section>
+
+        <TripTabs
+          tripId={tripId}
+          members={members}
+          expenses={expenses}
+          expenseSplits={expenseSplits}
+          bookingsContent={<BookingsTab tripId={tripId} />}
+        />
       </div>
     </main>
   );

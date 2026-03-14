@@ -8,6 +8,8 @@
 - Balance and settlement display
 
 ## V2
+- Trip container dashboard with Members, Expenses, and Bookings tabs
+- Booking timeline for flights, hotels, transport, and activities
 - Custom split ratios and exact amount splits
 - Expense editing/deletion
 - Trip list/dashboard view
