@@ -1,8 +1,12 @@
 alter table bookings
+add column if not exists onward_origin text,
+add column if not exists onward_destination text,
 add column if not exists onward_flight_number text,
 add column if not exists onward_departure_at timestamptz,
 add column if not exists onward_seat_number text,
 add column if not exists onward_pnr text,
+add column if not exists return_origin text,
+add column if not exists return_destination text,
 add column if not exists return_flight_number text,
 add column if not exists return_departure_at timestamptz,
 add column if not exists return_seat_number text,

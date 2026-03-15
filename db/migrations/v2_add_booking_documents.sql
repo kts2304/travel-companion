@@ -22,3 +22,10 @@ on storage.objects
 for insert
 to public
 with check (bucket_id = 'booking-documents');
+
+drop policy if exists "booking_documents_public_delete" on storage.objects;
+create policy "booking_documents_public_delete"
+on storage.objects
+for delete
+to public
+using (bucket_id = 'booking-documents');

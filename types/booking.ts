@@ -16,10 +16,14 @@ export interface Booking {
   hotel_name: string | null;
   room_number: string | null;
   place: string | null;
+  onward_origin: string | null;
+  onward_destination: string | null;
   onward_flight_number: string | null;
   onward_departure_at: string | null;
   onward_seat_number: string | null;
   onward_pnr: string | null;
+  return_origin: string | null;
+  return_destination: string | null;
   return_flight_number: string | null;
   return_departure_at: string | null;
   return_seat_number: string | null;

@@ -24,10 +24,14 @@ const addBookingSchema = z.object({
   hotelName: z.string().optional(),
   roomNumber: z.string().optional(),
   place: z.string().optional(),
+  onwardOrigin: z.string().optional(),
+  onwardDestination: z.string().optional(),
   onwardFlightNumber: z.string().optional(),
   onwardDepartureAt: z.string().optional(),
   onwardSeatNumber: z.string().optional(),
   onwardPnr: z.string().optional(),
+  returnOrigin: z.string().optional(),
+  returnDestination: z.string().optional(),
   returnFlightNumber: z.string().optional(),
   returnDepartureAt: z.string().optional(),
   returnSeatNumber: z.string().optional(),
@@ -108,10 +112,14 @@ export function AddBookingForm({
       hotelName: "",
       roomNumber: "",
       place: "",
+      onwardOrigin: "",
+      onwardDestination: "",
       onwardFlightNumber: "",
       onwardDepartureAt: "",
       onwardSeatNumber: "",
       onwardPnr: "",
+      returnOrigin: "",
+      returnDestination: "",
       returnFlightNumber: "",
       returnDepartureAt: "",
       returnSeatNumber: "",
@@ -120,6 +128,8 @@ export function AddBookingForm({
   });
   const selectedType = useWatch({ control, name: "type" }) ?? "flight";
   const selectedMemberId = useWatch({ control, name: "memberId" }) ?? "";
+  const selectedStartDate = useWatch({ control, name: "startDate" }) ?? "";
+  const selectedEndDate = useWatch({ control, name: "endDate" }) ?? "";
   const isPersonalBooking = personalBookingTypes.includes(selectedType);
   const isHotelBooking = selectedType === "hotel";
   const currentMember = useMemo(() => {
@@ -181,11 +191,27 @@ export function AddBookingForm({
     }
   }, [isHotelBooking, setValue, tripEndDate, tripStartDate]);
 
+  useEffect(() => {
+    if (isPersonalBooking && selectedEndDate && !selectedStartDate) {
+      setValue("endDate", "");
+    }
+  }, [isPersonalBooking, selectedEndDate, selectedStartDate, setValue]);
+
   const onSubmit = async (values: AddBookingFormValues) => {
     setSubmitError(null);
     setExtractSuccess(null);
 
     try {
+      if (isPersonalBooking) {
+        if (!selectedDocument) {
+          throw new Error("Upload a flight or bus ticket document before saving this booking.");
+        }
+
+        if (!values.startDate) {
+          throw new Error("We could not detect journey timing from this document. Please try another PDF/image.");
+        }
+      }
+
       const traveler = members.find((member) => member.id === values.memberId);
       const booking = await createBooking({
         tripId,
@@ -205,10 +231,14 @@ export function AddBookingForm({
         hotelName: values.hotelName,
         roomNumber: values.roomNumber,
         place: values.place,
+        onwardOrigin: values.onwardOrigin,
+        onwardDestination: values.onwardDestination,
         onwardFlightNumber: values.onwardFlightNumber,
         onwardDepartureAt: values.onwardDepartureAt,
         onwardSeatNumber: values.onwardSeatNumber,
         onwardPnr: values.onwardPnr,
+        returnOrigin: values.returnOrigin,
+        returnDestination: values.returnDestination,
         returnFlightNumber: values.returnFlightNumber,
         returnDepartureAt: values.returnDepartureAt,
         returnSeatNumber: values.returnSeatNumber,
@@ -228,10 +258,14 @@ export function AddBookingForm({
         hotelName: "",
         roomNumber: "",
         place: "",
+        onwardOrigin: "",
+        onwardDestination: "",
         onwardFlightNumber: "",
         onwardDepartureAt: "",
         onwardSeatNumber: "",
         onwardPnr: "",
+        returnOrigin: "",
+        returnDestination: "",
         returnFlightNumber: "",
         returnDepartureAt: "",
         returnSeatNumber: "",
@@ -255,21 +289,28 @@ export function AddBookingForm({
     setIsExtracting(true);
 
     try {
-      const extracted = await extractBookingDetailsFromFile(selectedDocument);
+      const selectedTraveler = currentMember ?? members.find((member) => member.id === selectedMemberId) ?? null;
+      const extracted = await extractBookingDetailsFromFile(selectedDocument, {
+        travelerName: selectedTraveler?.name,
+      });
       setValue("type", extracted.type, { shouldValidate: true });
       if (!personalBookingTypes.includes(extracted.type)) {
         setValue("memberId", "");
       }
       setValue("startDate", extracted.startDate, { shouldValidate: true });
-      setValue("endDate", extracted.endDate || (isHotelBooking && tripEndDate ? `${tripEndDate}T12:00` : ""));
+      setValue("endDate", extracted.endDate || (extracted.type === "hotel" && tripEndDate ? `${tripEndDate}T12:00` : ""));
       setValue("notes", extracted.notes);
       setValue("hotelName", extracted.hotelName);
       setValue("roomNumber", extracted.roomNumber);
       setValue("place", extracted.place);
+      setValue("onwardOrigin", extracted.onwardOrigin);
+      setValue("onwardDestination", extracted.onwardDestination);
       setValue("onwardFlightNumber", extracted.onwardFlightNumber);
       setValue("onwardDepartureAt", extracted.onwardDepartureAt);
       setValue("onwardSeatNumber", extracted.onwardSeatNumber);
       setValue("onwardPnr", extracted.onwardPnr);
+      setValue("returnOrigin", extracted.returnOrigin);
+      setValue("returnDestination", extracted.returnDestination);
       setValue("returnFlightNumber", extracted.returnFlightNumber);
       setValue("returnDepartureAt", extracted.returnDepartureAt);
       setValue("returnSeatNumber", extracted.returnSeatNumber);
@@ -397,13 +438,32 @@ export function AddBookingForm({
       )}
 
       {isHotelBooking ? (
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-          Hotel stay dates follow the trip dates by default.
-          <div className="mt-2 text-slate-200">
-            {tripStartDate || "-"} to {tripEndDate || "-"}
+        <div className="space-y-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
+          <p className="text-sm text-emerald-100">
+            Hotel stay dates follow the trip dates by default.
+          </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-slate-100">Start date</label>
+              <input
+                type="datetime-local"
+                value={selectedStartDate}
+                readOnly
+                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white opacity-90 outline-none"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="block text-sm font-medium text-slate-100">End date</label>
+              <input
+                type="datetime-local"
+                value={selectedEndDate}
+                readOnly
+                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white opacity-90 outline-none"
+              />
+            </div>
           </div>
         </div>
-      ) : (
+      ) : isPersonalBooking ? null : (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
             <label htmlFor="booking-start" className="block text-sm font-medium text-slate-100">
@@ -437,10 +497,14 @@ export function AddBookingForm({
       <input type="hidden" {...register("hotelName")} />
       <input type="hidden" {...register("roomNumber")} />
       <input type="hidden" {...register("place")} />
+      <input type="hidden" {...register("onwardOrigin")} />
+      <input type="hidden" {...register("onwardDestination")} />
       <input type="hidden" {...register("onwardFlightNumber")} />
       <input type="hidden" {...register("onwardDepartureAt")} />
       <input type="hidden" {...register("onwardSeatNumber")} />
       <input type="hidden" {...register("onwardPnr")} />
+      <input type="hidden" {...register("returnOrigin")} />
+      <input type="hidden" {...register("returnDestination")} />
       <input type="hidden" {...register("returnFlightNumber")} />
       <input type="hidden" {...register("returnDepartureAt")} />
       <input type="hidden" {...register("returnSeatNumber")} />

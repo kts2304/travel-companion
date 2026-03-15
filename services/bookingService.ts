@@ -19,10 +19,14 @@ interface CreateBookingInput {
   hotelName?: string;
   roomNumber?: string;
   place?: string;
+  onwardOrigin?: string;
+  onwardDestination?: string;
   onwardFlightNumber?: string;
   onwardDepartureAt?: string;
   onwardSeatNumber?: string;
   onwardPnr?: string;
+  returnOrigin?: string;
+  returnDestination?: string;
   returnFlightNumber?: string;
   returnDepartureAt?: string;
   returnSeatNumber?: string;
@@ -48,10 +52,14 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
       hotel_name: input.hotelName?.trim() || null,
       room_number: input.roomNumber?.trim() || null,
       place: input.place?.trim() || null,
+      onward_origin: input.onwardOrigin?.trim() || null,
+      onward_destination: input.onwardDestination?.trim() || null,
       onward_flight_number: input.onwardFlightNumber?.trim() || null,
       onward_departure_at: input.onwardDepartureAt || null,
       onward_seat_number: input.onwardSeatNumber?.trim() || null,
       onward_pnr: input.onwardPnr?.trim() || null,
+      return_origin: input.returnOrigin?.trim() || null,
+      return_destination: input.returnDestination?.trim() || null,
       return_flight_number: input.returnFlightNumber?.trim() || null,
       return_departure_at: input.returnDepartureAt || null,
       return_seat_number: input.returnSeatNumber?.trim() || null,
@@ -77,10 +85,14 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
     hotel_name: data.hotel_name ? String(data.hotel_name) : null,
     room_number: data.room_number ? String(data.room_number) : null,
     place: data.place ? String(data.place) : null,
+    onward_origin: data.onward_origin ? String(data.onward_origin) : null,
+    onward_destination: data.onward_destination ? String(data.onward_destination) : null,
     onward_flight_number: data.onward_flight_number ? String(data.onward_flight_number) : null,
     onward_departure_at: data.onward_departure_at ? String(data.onward_departure_at) : null,
     onward_seat_number: data.onward_seat_number ? String(data.onward_seat_number) : null,
     onward_pnr: data.onward_pnr ? String(data.onward_pnr) : null,
+    return_origin: data.return_origin ? String(data.return_origin) : null,
+    return_destination: data.return_destination ? String(data.return_destination) : null,
     return_flight_number: data.return_flight_number ? String(data.return_flight_number) : null,
     return_departure_at: data.return_departure_at ? String(data.return_departure_at) : null,
     return_seat_number: data.return_seat_number ? String(data.return_seat_number) : null,
@@ -114,10 +126,14 @@ export async function getBookingsByTrip(tripId: string): Promise<Booking[]> {
     hotel_name: booking.hotel_name ? String(booking.hotel_name) : null,
     room_number: booking.room_number ? String(booking.room_number) : null,
     place: booking.place ? String(booking.place) : null,
+    onward_origin: booking.onward_origin ? String(booking.onward_origin) : null,
+    onward_destination: booking.onward_destination ? String(booking.onward_destination) : null,
     onward_flight_number: booking.onward_flight_number ? String(booking.onward_flight_number) : null,
     onward_departure_at: booking.onward_departure_at ? String(booking.onward_departure_at) : null,
     onward_seat_number: booking.onward_seat_number ? String(booking.onward_seat_number) : null,
     onward_pnr: booking.onward_pnr ? String(booking.onward_pnr) : null,
+    return_origin: booking.return_origin ? String(booking.return_origin) : null,
+    return_destination: booking.return_destination ? String(booking.return_destination) : null,
     return_flight_number: booking.return_flight_number ? String(booking.return_flight_number) : null,
     return_departure_at: booking.return_departure_at ? String(booking.return_departure_at) : null,
     return_seat_number: booking.return_seat_number ? String(booking.return_seat_number) : null,
@@ -132,6 +148,43 @@ export async function deleteBooking(bookingId: string): Promise<void> {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+function getStoragePathFromPublicUrl(fileUrl: string): string | null {
+  try {
+    const url = new URL(fileUrl);
+    const marker = "/storage/v1/object/public/booking-documents/";
+    const pathIndex = url.pathname.indexOf(marker);
+
+    if (pathIndex === -1) {
+      return null;
+    }
+
+    return decodeURIComponent(url.pathname.slice(pathIndex + marker.length));
+  } catch {
+    return null;
+  }
+}
+
+export async function deleteBookingEntry(
+  bookingId: string,
+  documents: BookingDocument[],
+): Promise<void> {
+  const filePaths = documents
+    .map((document) => getStoragePathFromPublicUrl(document.file_url))
+    .filter((filePath): filePath is string => Boolean(filePath));
+
+  if (filePaths.length > 0) {
+    const { error: storageError } = await supabase.storage
+      .from("booking-documents")
+      .remove(filePaths);
+
+    if (storageError) {
+      throw new Error(storageError.message);
+    }
+  }
+
+  await deleteBooking(bookingId);
 }
 
 function validateBookingDocument(file: File) {

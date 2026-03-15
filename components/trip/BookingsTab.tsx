@@ -1,4 +1,5 @@
 import { BookingDocumentsPanel } from "@/components/trip/BookingDocumentsPanel";
+import { DeleteBookingButton } from "@/components/trip/DeleteBookingButton";
 import { AddBookingForm } from "@/components/forms/AddBookingForm";
 import { MyTravelPanel } from "@/components/trip/MyTravelPanel";
 import {
@@ -104,6 +105,11 @@ export async function BookingsTab({
                 <p className="mt-2 text-sm text-slate-200">{booking.notes}</p>
               )}
               <BookingDocumentsPanel bookingId={booking.id} documents={documents} />
+              <DeleteBookingButton
+                bookingId={booking.id}
+                bookingLabel={booking.title}
+                documents={documents}
+              />
             </div>
           ))}
         </div>

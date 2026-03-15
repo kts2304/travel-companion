@@ -11,6 +11,11 @@ export interface AddMemberInput {
   email?: string;
 }
 
+export interface UpdateMemberInput {
+  name: string;
+  email?: string;
+}
+
 export interface MemberBalance {
   memberId: string;
   memberName: string;

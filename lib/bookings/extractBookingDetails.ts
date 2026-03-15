@@ -20,14 +20,22 @@ export interface ExtractedBookingDetails {
   hotelName: string;
   roomNumber: string;
   place: string;
+  onwardOrigin: string;
+  onwardDestination: string;
   onwardFlightNumber: string;
   onwardDepartureAt: string;
   onwardSeatNumber: string;
   onwardPnr: string;
+  returnOrigin: string;
+  returnDestination: string;
   returnFlightNumber: string;
   returnDepartureAt: string;
   returnSeatNumber: string;
   returnPnr: string;
+}
+
+interface ExtractBookingDetailsOptions {
+  travelerName?: string;
 }
 
 function toDateTimeLocal(date: Date): string {
@@ -121,7 +129,17 @@ function extractTitle(text: string, type: BookingType): string {
 }
 
 function normalizeRawText(text: string): string {
-  return text.replace(/\s+/g, " ").trim();
+  return text
+    .replace(/[ \t]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .trim();
+}
+
+function normalizeLineText(text: string): string[] {
+  return text
+    .split(/\n+/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
 }
 
 function extractFirstMatch(text: string, pattern: RegExp): string {
@@ -134,47 +152,294 @@ function extractAllMatches(text: string, pattern: RegExp): string[] {
 }
 
 function normalizeFlightToken(value: string): string {
-  return value.replace(/\s+/g, "").toUpperCase();
+  return value.replace(/\s+/g, "").replace(/-+/g, "-").toUpperCase();
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function isMeaningfulToken(value: string): boolean {
+  return /^[A-Z0-9-]+$/.test(value) && ![
+    "FLIGHT",
+    "E-TICKET",
+    "ETICKET",
+    "TICKET",
+    "NUMBER",
+    "REF",
+    "BOOKING",
+    "PNR",
+    "IS",
+    "OR",
+    "NO",
+    "NA",
+  ].includes(value);
+}
+
+function isValidFlightNumber(value: string): boolean {
+  const normalized = normalizeFlightToken(value);
+  return /^(?:6E|AI|UK|SG|I5|QP|IX|G8)-?\d{1,4}$/.test(normalized);
+}
+
+function isValidSeatNumber(value: string): boolean {
+  return /^\d{1,2}[A-F]$/i.test(value.trim());
+}
+
+function isValidPnr(value: string): boolean {
+  const normalized = value.trim().toUpperCase();
+  return normalized.length >= 5 && normalized.length <= 12 && isMeaningfulToken(normalized);
+}
+
+function toDateTimeLocalFromParts(monthText: string, dayText: string, yearText: string, timeText: string): string {
+  const monthIndex = [
+    "jan",
+    "feb",
+    "mar",
+    "apr",
+    "may",
+    "jun",
+    "jul",
+    "aug",
+    "sep",
+    "oct",
+    "nov",
+    "dec",
+  ].indexOf(monthText.slice(0, 3).toLowerCase());
+
+  if (monthIndex === -1) {
+    return "";
+  }
+
+  const date = new Date(
+    Number(yearText),
+    monthIndex,
+    Number(dayText),
+    Number(timeText.slice(0, 2)),
+    Number(timeText.slice(3, 5)),
+  );
+
+  return Number.isNaN(date.getTime()) ? "" : toDateTimeLocal(date);
+}
+
+function extractDateTimeByLabel(rawText: string, label: "departure" | "arrival"): string {
+  const directMatch = rawText.match(
+    new RegExp(
+      `\\b${label}\\s+[^A-Z0-9]{0,10}?([A-Za-z]{3},?\\s+[A-Za-z]{3}\\s+\\d{1,2}\\s+\\d{4}\\s+\\d{1,2}:\\d{2})\\s*(?:Hrs)?`,
+      "i",
+    ),
+  );
+
+  if (directMatch?.[1]) {
+    const parts = directMatch[1].match(/[A-Za-z]{3},?\s+([A-Za-z]{3})\s+(\d{1,2})\s+(\d{4})\s+(\d{1,2}:\d{2})/i);
+    if (parts) {
+      return toDateTimeLocalFromParts(parts[1], parts[2], parts[3], parts[4]);
+    }
+  }
+
+  return "";
+}
+
+function extractTicketPassengerSeat(rawText: string): string {
+  const seat = (
+    extractFirstMatch(
+      rawText,
+      /\bseat\s*no\.?\s*[:\s-]*([0-9]{1,2}[A-Z])(?:\s*\(confirmed\))?/i,
+    ) ||
+    extractFirstMatch(rawText, /\b([0-9]{1,2}[A-Z])\s*\(confirmed\)/i)
+  );
+
+  return isValidSeatNumber(seat) ? seat.toUpperCase() : "";
+}
+
+function extractFlightPnr(rawText: string): string {
+  const pnr = (
+    extractFirstMatch(rawText, /\bpnr\s*[:\s-]*([A-Z0-9]{5,10})\b/i) ||
+    extractFirstMatch(rawText, /\bbooking\s*(?:number|reference|ref)\s*[:\s-]*([A-Z0-9]{5,12})\b/i) ||
+    extractFirstMatch(rawText, /\bticket\s*no\.?\s*[:\s-]*([A-Z0-9]{5,12})\b/i)
+  );
+
+  return isValidPnr(pnr) ? pnr.toUpperCase() : "";
+}
+
+function buildDateTimeFromParts(dateLabel: string, hourText: string, minuteText: string): string {
+  const normalizedDate = new Date(dateLabel);
+  if (Number.isNaN(normalizedDate.getTime())) {
+    return "";
+  }
+
+  normalizedDate.setHours(Number(hourText), Number(minuteText), 0, 0);
+  return toDateTimeLocal(normalizedDate);
+}
+
+function extractRouteFromChunk(chunk: string): { origin: string; destination: string } {
+  const routeMatch = chunk.match(
+    /\b([A-Za-z][A-Za-z ]{2,40})\s+([A-Za-z][A-Za-z ]{2,40})\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),/i,
+  );
+
+  if (!routeMatch) {
+    return { origin: "", destination: "" };
+  }
+
+  return {
+    origin: routeMatch[1].replace(/\s+/g, " ").trim(),
+    destination: routeMatch[2].replace(/\s+/g, " ").trim(),
+  };
+}
+
+function extractTravelerFlightChunkDetails(chunk: string): {
+  origin: string;
+  destination: string;
+  flightNumber: string;
+  departureAt: string;
+  seatNumber: string;
+  pnr: string;
+} {
+  const flightNumberMatch = chunk.match(/\b((?:6\s*E|AI|UK|SG|I5|QP|IX|G8)\s*-\s*\d{1,4})\b/i);
+  const flightNumber = flightNumberMatch ? normalizeFlightToken(flightNumberMatch[1]) : "";
+  const passengerRowMatch = chunk.match(
+    /\b(?:\d+\s*kgs?\s*\(Free\)\s*)(\d{1,2})\s*([A-Z])\s*\(Confirmed.*?\)\s*([A-Z0-9]{5,12})/i,
+  );
+  const seatNumber = passengerRowMatch
+    ? `${passengerRowMatch[1]}${passengerRowMatch[2]}`
+    : extractTicketPassengerSeat(chunk);
+  const pnr = passengerRowMatch?.[3] && isValidPnr(passengerRowMatch[3])
+    ? passengerRowMatch[3].toUpperCase()
+    : extractFlightPnr(chunk);
+  const route = extractRouteFromChunk(chunk);
+
+  const dateMatches = Array.from(
+    chunk.matchAll(/\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s+[A-Za-z]{3}\s+\d{1,2}\s+\d{4}\b/gi),
+  ).map((match) => match[0]);
+  const hourMatches = Array.from(chunk.matchAll(/\b(\d{1,2})\s*:/g)).map((match) => match[1]);
+  const minuteMatches = Array.from(chunk.matchAll(/\b(\d{2})\s+Hrs\b/gi)).map((match) => match[1]);
+  const departureAt =
+    dateMatches[0] && hourMatches[0] && minuteMatches[0]
+      ? buildDateTimeFromParts(dateMatches[0], hourMatches[0], minuteMatches[0])
+      : "";
+
+  return {
+    origin: route.origin,
+    destination: route.destination,
+    flightNumber,
+    departureAt,
+    seatNumber,
+    pnr,
+  };
+}
+
+function extractFlightDetailsForTraveler(
+  rawText: string,
+  travelerName: string,
+): Omit<
+  ExtractedBookingDetails,
+  "type" | "title" | "startDate" | "endDate" | "notes" | "rawText" | "hotelName" | "roomNumber" | "place"
+> | null {
+  const normalizedTravelerName = travelerName.trim();
+  if (!normalizedTravelerName) {
+    return null;
+  }
+
+  const travelerPattern = new RegExp(escapeRegExp(normalizedTravelerName), "gi");
+  const travelerChunks = Array.from(rawText.matchAll(travelerPattern))
+    .map((match) => {
+      const startIndex = match.index ?? 0;
+      const nextPageIndex = rawText.indexOf("Download Yatra App", startIndex + normalizedTravelerName.length);
+      const endIndex = nextPageIndex === -1 ? rawText.length : nextPageIndex;
+      return rawText.slice(startIndex, endIndex);
+    })
+    .filter(Boolean);
+
+  if (travelerChunks.length === 0) {
+    return null;
+  }
+
+  const onward = extractTravelerFlightChunkDetails(travelerChunks[0]);
+  const returnChunk = travelerChunks[1] ? extractTravelerFlightChunkDetails(travelerChunks[1]) : null;
+
+  return {
+    onwardOrigin: onward.origin,
+    onwardDestination: onward.destination,
+    onwardFlightNumber: onward.flightNumber,
+    onwardDepartureAt: onward.departureAt,
+    onwardSeatNumber: onward.seatNumber,
+    onwardPnr: onward.pnr,
+    returnOrigin: returnChunk?.origin ?? "",
+    returnDestination: returnChunk?.destination ?? "",
+    returnFlightNumber: returnChunk?.flightNumber ?? "",
+    returnDepartureAt: returnChunk?.departureAt ?? "",
+    returnSeatNumber: returnChunk?.seatNumber ?? "",
+    returnPnr: returnChunk?.pnr ?? "",
+  };
 }
 
 function extractFlightDetails(rawText: string): Omit<
   ExtractedBookingDetails,
   "type" | "title" | "startDate" | "endDate" | "notes" | "rawText" | "hotelName" | "roomNumber" | "place"
 > {
+  const lines = normalizeLineText(rawText);
   const airlineFlightMatches = extractAllMatches(
     rawText,
-    /\b((?:6E|AI|UK|SG|I5|QP|IX|G8)\s?\d{1,4})\b/gi,
-  ).map(normalizeFlightToken);
+    /\b((?:6E|AI|UK|SG|I5|QP|IX|G8)\s?-?\d{1,4})\b/gi,
+  )
+    .map(normalizeFlightToken)
+    .filter(isValidFlightNumber);
   const labeledFlightMatches = extractAllMatches(
     rawText,
-    /\b(?:flight|flt)\s*(?:no|number|#)?[:\s-]*([A-Z0-9]{2,10})/gi,
-  ).map(normalizeFlightToken);
+    /\b(?:flight|flt)\s*(?:no|number|#)?[:\s.-]*([A-Z0-9-]{2,10})/gi,
+  )
+    .map(normalizeFlightToken)
+    .filter(isValidFlightNumber);
+  const lineFlightMatches = lines
+    .flatMap((line) => Array.from(line.matchAll(/\b((?:6E|AI|UK|SG|I5|QP|IX|G8)\s?-?\d{1,4})\b/gi)))
+    .map((match) => normalizeFlightToken(match[1] ?? ""))
+    .filter(isValidFlightNumber);
   const allFlightMatches = Array.from(new Set([...airlineFlightMatches, ...labeledFlightMatches]));
+  const dedupedFlightMatches = Array.from(new Set([...allFlightMatches, ...lineFlightMatches]));
   const allSeatMatches = Array.from(
     new Set([
-      ...extractAllMatches(rawText, /\bseat\s*(?:no|number|#)?[:\s-]*([A-Z0-9]{1,4})/gi),
+      extractTicketPassengerSeat(rawText),
+      ...extractAllMatches(rawText, /\bseat\s*(?:no\.?|number|#)?[:\s.-]*([A-Z0-9]{1,4})/gi),
       ...extractAllMatches(rawText, /\b(\d{1,2}[A-F])\b/g),
-    ]),
+    ]
+      .filter(Boolean)
+      .map((value) => value.toUpperCase())
+      .filter(isValidSeatNumber)),
   );
+  const extractedPnr = extractFlightPnr(rawText);
   const allPnrMatches = Array.from(
     new Set(
-      extractAllMatches(
-        rawText,
-        /\b(?:pnr|booking reference|booking number|reservation code|ref)\s*[:\s-]*([A-Z0-9]{5,12})/gi,
-      ),
+      [
+        extractedPnr,
+        ...extractAllMatches(
+          rawText,
+          /\b(?:pnr|booking reference|booking number|reservation code|ref|ticket no\.?)\s*[:\s.-]*([A-Z0-9]{5,12})/gi,
+        ),
+      ]
+        .filter(Boolean)
+        .map((value) => value.toUpperCase())
+        .filter(isValidPnr),
     ),
   );
+  const departureAt = extractDateTimeByLabel(rawText, "departure");
   const dates = extractCandidateDates(rawText).map((date) => toDateTimeLocal(date));
+  const hasSecondLegEvidence =
+    /\breturn\b/i.test(rawText) ||
+    dedupedFlightMatches.length > 1 ||
+    allPnrMatches.length > 1;
 
   return {
-    onwardFlightNumber: allFlightMatches[0] ?? "",
-    onwardDepartureAt: dates[0] ?? "",
+    onwardOrigin: "",
+    onwardDestination: "",
+    onwardFlightNumber: dedupedFlightMatches[0] ?? "",
+    onwardDepartureAt: departureAt || dates[0] || "",
     onwardSeatNumber: allSeatMatches[0] ?? "",
     onwardPnr: allPnrMatches[0] ?? "",
-    returnFlightNumber: allFlightMatches[1] ?? "",
-    returnDepartureAt: dates[1] ?? "",
-    returnSeatNumber: allSeatMatches[1] ?? "",
-    returnPnr: allPnrMatches[1] ?? "",
+    returnOrigin: "",
+    returnDestination: "",
+    returnFlightNumber: hasSecondLegEvidence ? (dedupedFlightMatches[1] ?? "") : "",
+    returnDepartureAt: hasSecondLegEvidence ? (dates[1] || "") : "",
+    returnSeatNumber: hasSecondLegEvidence ? (allSeatMatches[1] ?? "") : "",
+    returnPnr: hasSecondLegEvidence ? (allPnrMatches[1] ?? "") : "",
   };
 }
 
@@ -259,9 +524,37 @@ async function extractTextFromPdf(file: File): Promise<string> {
   for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
     const page = await pdf.getPage(pageNumber);
     const textContent = await page.getTextContent();
-    const pageText = textContent.items
-      .map((item) => ("str" in item ? item.str : ""))
-      .join(" ");
+    const lineMap = new Map<number, Array<{ x: number; text: string }>>();
+
+    for (const item of textContent.items) {
+      if (!("str" in item) || !("transform" in item)) {
+        continue;
+      }
+
+      const text = item.str?.trim();
+      if (!text) {
+        continue;
+      }
+
+      const transform = Array.isArray(item.transform) ? item.transform : [];
+      const x = typeof transform[4] === "number" ? transform[4] : 0;
+      const y = typeof transform[5] === "number" ? transform[5] : 0;
+      const lineKey = Math.round(y);
+      const existingLine = lineMap.get(lineKey) ?? [];
+      existingLine.push({ x, text });
+      lineMap.set(lineKey, existingLine);
+    }
+
+    const pageText = Array.from(lineMap.entries())
+      .sort((left, right) => right[0] - left[0])
+      .map(([, items]) =>
+        items
+          .sort((left, right) => left.x - right.x)
+          .map((entry) => entry.text)
+          .join(" "),
+      )
+      .join("\n");
+
     pageTexts.push(pageText);
   }
 
@@ -297,7 +590,10 @@ async function extractTextFromImage(file: File): Promise<string> {
   }
 }
 
-function buildExtractedBookingDetails(rawText: string): ExtractedBookingDetails {
+function buildExtractedBookingDetails(
+  rawText: string,
+  options?: ExtractBookingDetailsOptions,
+): ExtractedBookingDetails {
   if (!rawText) {
     throw new Error("Could not extract readable text from this file.");
   }
@@ -316,25 +612,36 @@ function buildExtractedBookingDetails(rawText: string): ExtractedBookingDetails 
           roomNumber: "",
           place: "",
         };
+  const emptyFlightDetails = {
+    onwardOrigin: "",
+    onwardDestination: "",
+    onwardFlightNumber: "",
+    onwardDepartureAt: "",
+    onwardSeatNumber: "",
+    onwardPnr: "",
+    returnOrigin: "",
+    returnDestination: "",
+    returnFlightNumber: "",
+    returnDepartureAt: "",
+    returnSeatNumber: "",
+    returnPnr: "",
+  };
+  const travelerFlightDetails =
+    type === "flight" && options?.travelerName
+      ? extractFlightDetailsForTraveler(rawText, options.travelerName)
+      : null;
   const flightDetails =
     type === "flight"
-      ? extractFlightDetails(rawText)
-      : {
-          onwardFlightNumber: "",
-          onwardDepartureAt: "",
-          onwardSeatNumber: "",
-          onwardPnr: "",
-          returnFlightNumber: "",
-          returnDepartureAt: "",
-          returnSeatNumber: "",
-          returnPnr: "",
-        };
+      ? travelerFlightDetails ?? extractFlightDetails(rawText)
+      : emptyFlightDetails;
+  const resolvedStartDate = flightDetails.onwardDepartureAt || (dates[0] ? toDateTimeLocal(dates[0]) : "");
+  const resolvedEndDate = flightDetails.returnDepartureAt || "";
 
   return {
     type,
     title,
-    startDate,
-    endDate,
+    startDate: resolvedStartDate || startDate,
+    endDate: resolvedEndDate || endDate,
     notes,
     rawText,
     ...hotelDetails,
@@ -344,13 +651,14 @@ function buildExtractedBookingDetails(rawText: string): ExtractedBookingDetails 
 
 export async function extractBookingDetailsFromFile(
   file: File,
+  options?: ExtractBookingDetailsOptions,
 ): Promise<ExtractedBookingDetails> {
   if (file.type === "application/pdf") {
-    return buildExtractedBookingDetails(await extractTextFromPdfWithOcrFallback(file));
+    return buildExtractedBookingDetails(await extractTextFromPdfWithOcrFallback(file), options);
   }
 
   if (file.type.startsWith("image/")) {
-    return buildExtractedBookingDetails(await extractTextFromImage(file));
+    return buildExtractedBookingDetails(await extractTextFromImage(file), options);
   }
 
   throw new Error("Only PDF and image files are supported for extraction.");
