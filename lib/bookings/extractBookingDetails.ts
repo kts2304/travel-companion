@@ -272,6 +272,15 @@ function buildDateTimeFromParts(dateLabel: string, hourText: string, minuteText:
 }
 
 function extractRouteFromChunk(chunk: string): { origin: string; destination: string } {
+  const codeRouteMatch = chunk.match(/\b([A-Z]{3})\s*-\s*([A-Z]{3})\b/);
+
+  if (codeRouteMatch) {
+    return {
+      origin: codeRouteMatch[1],
+      destination: codeRouteMatch[2],
+    };
+  }
+
   const routeMatch = chunk.match(
     /\b([A-Za-z][A-Za-z ]{2,40})\s+([A-Za-z][A-Za-z ]{2,40})\s+(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),/i,
   );
@@ -297,7 +306,7 @@ function extractTravelerFlightChunkDetails(chunk: string): {
   const flightNumberMatch = chunk.match(/\b((?:6\s*E|AI|UK|SG|I5|QP|IX|G8)\s*-\s*\d{1,4})\b/i);
   const flightNumber = flightNumberMatch ? normalizeFlightToken(flightNumberMatch[1]) : "";
   const passengerRowMatch = chunk.match(
-    /\b(?:\d+\s*kgs?\s*\(Free\)\s*)(\d{1,2})\s*([A-Z])\s*\(Confirmed.*?\)\s*([A-Z0-9]{5,12})/i,
+    /\b(?:\d+\s*kgs?\s*\(Free\s*\)\s*)(\d{1,2})\s*([A-Z])\s*\(Confirmed.*?\)\s*([A-Z0-9]{5,12})/i,
   );
   const seatNumber = passengerRowMatch
     ? `${passengerRowMatch[1]}${passengerRowMatch[2]}`
@@ -342,8 +351,9 @@ function extractFlightDetailsForTraveler(
   const travelerPattern = new RegExp(escapeRegExp(normalizedTravelerName), "gi");
   const travelerChunks = Array.from(rawText.matchAll(travelerPattern))
     .map((match) => {
-      const startIndex = match.index ?? 0;
-      const nextPageIndex = rawText.indexOf("Download Yatra App", startIndex + normalizedTravelerName.length);
+      const matchIndex = match.index ?? 0;
+      const startIndex = Math.max(0, matchIndex - 280);
+      const nextPageIndex = rawText.indexOf("Download Yatra App", matchIndex + normalizedTravelerName.length);
       const endIndex = nextPageIndex === -1 ? rawText.length : nextPageIndex;
       return rawText.slice(startIndex, endIndex);
     })
@@ -446,28 +456,67 @@ function extractFlightDetails(rawText: string): Omit<
 function extractHotelDetails(
   rawText: string,
   title: string,
-): Pick<ExtractedBookingDetails, "hotelName" | "roomNumber" | "place"> {
+): Pick<ExtractedBookingDetails, "hotelName" | "roomNumber" | "place"> & { summaryNotes: string } {
   const lines = rawText
     .split(/\n+/)
     .map((line) => line.trim())
     .filter(Boolean);
+  const stayRows = lines
+    .map((line) => {
+      const stayMatch = line.match(
+        /^([A-Za-z]+)\s+(.+?)\s+([A-Za-z]{3}-\d{1,2})\s+([A-Za-z]{3}-\d{1,2})\s+([A-Za-z0-9/]+(?:\s*-\s*[A-Za-z0-9]+)?)\s+(.+)$/,
+      );
+
+      if (!stayMatch) {
+        return null;
+      }
+
+      return {
+        city: stayMatch[1].trim(),
+        hotelName: stayMatch[2].trim(),
+        checkIn: stayMatch[3].trim(),
+        checkOut: stayMatch[4].trim(),
+        roomNo: stayMatch[5].replace(/\s+/g, ""),
+        guests: stayMatch[6].trim(),
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => Boolean(row));
+  const uniqueHotelNames = Array.from(new Set(stayRows.map((row) => row.hotelName)));
+  const uniqueCities = Array.from(new Set(stayRows.map((row) => row.city)));
   const hotelName =
+    (stayRows.length > 0
+      ? uniqueHotelNames.length === 1
+        ? uniqueHotelNames[0]
+        : `${uniqueHotelNames[0]} + ${uniqueHotelNames.length - 1} more`
+      : "") ||
     extractFirstMatch(rawText, /\b(?:hotel|property|stay at)\s*[:\s-]*([A-Za-z0-9 .&'-]{3,80})/i) ||
     lines.find((line) => /(hotel|resort|inn|suites|villa)/i.test(line)) ||
     title;
   const roomNumber = extractFirstMatch(
     rawText,
     /\b(?:room|room no|room number|rm)\s*[:#\s-]*([A-Z0-9-]{1,10})/i,
-  );
+  ) || (stayRows.length > 0 ? `${stayRows.length} allocations` : "");
   const place =
+    (stayRows.length > 0
+      ? uniqueCities.length === 1
+        ? uniqueCities[0]
+        : uniqueCities.join(" / ")
+      : "") ||
     extractFirstMatch(rawText, /\b(?:address|location|city|place)\s*[:\s-]*([A-Za-z0-9, .-]{3,80})/i) ||
     lines.find((line) => /(road|street|nagar|city|goa|delhi|mumbai|bengaluru|bangalore|hyderabad|jaipur|udupi|mysuru|mysore)/i.test(line)) ||
     "";
+  const summaryNotes = stayRows
+    .map(
+      (row) =>
+        `${row.city} | ${row.hotelName} | ${row.checkIn} to ${row.checkOut} | Room ${row.roomNo} | Guests: ${row.guests}`,
+    )
+    .join("\n");
 
   return {
     hotelName: hotelName.trim(),
     roomNumber,
     place: place.trim(),
+    summaryNotes,
   };
 }
 
@@ -603,7 +652,6 @@ function buildExtractedBookingDetails(
   const dates = extractCandidateDates(rawText);
   const startDate = dates[0] ? toDateTimeLocal(dates[0]) : "";
   const endDate = dates[1] ? toDateTimeLocal(dates[1]) : "";
-  const notes = rawText.slice(0, 500);
   const hotelDetails =
     type === "hotel"
       ? extractHotelDetails(rawText, title)
@@ -611,7 +659,9 @@ function buildExtractedBookingDetails(
           hotelName: "",
           roomNumber: "",
           place: "",
+          summaryNotes: "",
         };
+  const notes = type === "hotel" ? hotelDetails.summaryNotes : rawText.slice(0, 500);
   const emptyFlightDetails = {
     onwardOrigin: "",
     onwardDestination: "",

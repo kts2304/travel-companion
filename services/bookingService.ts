@@ -33,6 +33,19 @@ interface CreateBookingInput {
   returnPnr?: string;
 }
 
+function toSupabaseTimestamp(value?: string): string | null {
+  if (!value?.trim()) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toISOString();
+}
+
 export async function createBooking(input: CreateBookingInput): Promise<Booking> {
   if (input.scope === "personal" && !input.memberId) {
     throw new Error("A traveler is required for personal tickets.");
@@ -46,8 +59,8 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
       scope: input.scope,
       member_id: input.memberId ?? null,
       title: input.title,
-      start_date: input.startDate,
-      end_date: input.endDate || null,
+      start_date: toSupabaseTimestamp(input.startDate),
+      end_date: toSupabaseTimestamp(input.endDate),
       notes: input.notes?.trim() || null,
       hotel_name: input.hotelName?.trim() || null,
       room_number: input.roomNumber?.trim() || null,
@@ -55,13 +68,13 @@ export async function createBooking(input: CreateBookingInput): Promise<Booking>
       onward_origin: input.onwardOrigin?.trim() || null,
       onward_destination: input.onwardDestination?.trim() || null,
       onward_flight_number: input.onwardFlightNumber?.trim() || null,
-      onward_departure_at: input.onwardDepartureAt || null,
+      onward_departure_at: toSupabaseTimestamp(input.onwardDepartureAt),
       onward_seat_number: input.onwardSeatNumber?.trim() || null,
       onward_pnr: input.onwardPnr?.trim() || null,
       return_origin: input.returnOrigin?.trim() || null,
       return_destination: input.returnDestination?.trim() || null,
       return_flight_number: input.returnFlightNumber?.trim() || null,
-      return_departure_at: input.returnDepartureAt || null,
+      return_departure_at: toSupabaseTimestamp(input.returnDepartureAt),
       return_seat_number: input.returnSeatNumber?.trim() || null,
       return_pnr: input.returnPnr?.trim() || null,
     })
@@ -140,6 +153,46 @@ export async function getBookingsByTrip(tripId: string): Promise<Booking[]> {
     return_pnr: booking.return_pnr ? String(booking.return_pnr) : null,
     created_at: String(booking.created_at),
   }));
+}
+
+export async function getBookingById(bookingId: string): Promise<Booking | null> {
+  const { data, error } = await supabase.from("bookings").select("*").eq("id", bookingId).maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  return {
+    id: String(data.id),
+    trip_id: String(data.trip_id),
+    type: data.type as BookingType,
+    scope: data.scope as BookingScope,
+    member_id: data.member_id ? String(data.member_id) : null,
+    title: String(data.title),
+    start_date: String(data.start_date),
+    end_date: data.end_date ? String(data.end_date) : null,
+    notes: data.notes ? String(data.notes) : null,
+    hotel_name: data.hotel_name ? String(data.hotel_name) : null,
+    room_number: data.room_number ? String(data.room_number) : null,
+    place: data.place ? String(data.place) : null,
+    onward_origin: data.onward_origin ? String(data.onward_origin) : null,
+    onward_destination: data.onward_destination ? String(data.onward_destination) : null,
+    onward_flight_number: data.onward_flight_number ? String(data.onward_flight_number) : null,
+    onward_departure_at: data.onward_departure_at ? String(data.onward_departure_at) : null,
+    onward_seat_number: data.onward_seat_number ? String(data.onward_seat_number) : null,
+    onward_pnr: data.onward_pnr ? String(data.onward_pnr) : null,
+    return_origin: data.return_origin ? String(data.return_origin) : null,
+    return_destination: data.return_destination ? String(data.return_destination) : null,
+    return_flight_number: data.return_flight_number ? String(data.return_flight_number) : null,
+    return_departure_at: data.return_departure_at ? String(data.return_departure_at) : null,
+    return_seat_number: data.return_seat_number ? String(data.return_seat_number) : null,
+    return_pnr: data.return_pnr ? String(data.return_pnr) : null,
+    created_at: String(data.created_at),
+  };
 }
 
 export async function deleteBooking(bookingId: string): Promise<void> {

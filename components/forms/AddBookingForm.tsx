@@ -79,6 +79,9 @@ interface AddBookingFormProps {
   members: Member[];
   tripStartDate?: string | null;
   tripEndDate?: string | null;
+  allowedTypes?: BookingType[];
+  heading?: string;
+  description?: string;
 }
 
 export function AddBookingForm({
@@ -86,6 +89,9 @@ export function AddBookingForm({
   members,
   tripStartDate,
   tripEndDate,
+  allowedTypes,
+  heading = "Import details from document",
+  description = "Upload a flight, bus, hotel, transport, or activity PDF/image to pre-fill this form.",
 }: AddBookingFormProps) {
   const router = useRouter();
   const fileInputId = useId();
@@ -95,6 +101,9 @@ export function AddBookingForm({
   const [extractSuccess, setExtractSuccess] = useState<string | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
+
+  const availableTypes = allowedTypes?.length ? allowedTypes : bookingTypes;
+  const defaultType = availableTypes[0] ?? "flight";
 
   const {
     register,
@@ -106,7 +115,7 @@ export function AddBookingForm({
   } = useForm<AddBookingFormValues>({
     resolver: zodResolver(addBookingSchema),
     defaultValues: {
-      type: "flight",
+      type: defaultType,
       memberId: "",
       notes: "",
       hotelName: "",
@@ -126,7 +135,7 @@ export function AddBookingForm({
       returnPnr: "",
     },
   });
-  const selectedType = useWatch({ control, name: "type" }) ?? "flight";
+  const selectedType = useWatch({ control, name: "type" }) ?? defaultType;
   const selectedMemberId = useWatch({ control, name: "memberId" }) ?? "";
   const selectedStartDate = useWatch({ control, name: "startDate" }) ?? "";
   const selectedEndDate = useWatch({ control, name: "endDate" }) ?? "";
@@ -250,7 +259,7 @@ export function AddBookingForm({
       }
 
       reset({
-        type: "flight",
+        type: defaultType,
         memberId: "",
         startDate: "",
         endDate: "",
@@ -293,12 +302,29 @@ export function AddBookingForm({
       const extracted = await extractBookingDetailsFromFile(selectedDocument, {
         travelerName: selectedTraveler?.name,
       });
+
+      if (!availableTypes.includes(extracted.type)) {
+        throw new Error(
+          `This document looks like a ${extracted.type} booking. Use the matching booking section for it.`,
+        );
+      }
+
       setValue("type", extracted.type, { shouldValidate: true });
       if (!personalBookingTypes.includes(extracted.type)) {
         setValue("memberId", "");
       }
-      setValue("startDate", extracted.startDate, { shouldValidate: true });
-      setValue("endDate", extracted.endDate || (extracted.type === "hotel" && tripEndDate ? `${tripEndDate}T12:00` : ""));
+
+      const resolvedStartDate =
+        extracted.type === "hotel"
+          ? extracted.startDate || (tripStartDate ? `${tripStartDate}T12:00` : "")
+          : extracted.startDate;
+      const resolvedEndDate =
+        extracted.type === "hotel"
+          ? extracted.endDate || (tripEndDate ? `${tripEndDate}T12:00` : "")
+          : extracted.endDate;
+
+      setValue("startDate", resolvedStartDate, { shouldValidate: true });
+      setValue("endDate", resolvedEndDate);
       setValue("notes", extracted.notes);
       setValue("hotelName", extracted.hotelName);
       setValue("roomNumber", extracted.roomNumber);
@@ -332,9 +358,9 @@ export function AddBookingForm({
       className="space-y-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-5 shadow-[0_20px_60px_rgba(1,6,17,0.28)]"
     >
       <div className="rounded-xl border border-violet-500/25 bg-violet-500/10 p-4">
-        <p className="text-sm font-medium text-violet-200">Import details from document</p>
+        <p className="text-sm font-medium text-violet-200">{heading}</p>
         <p className="mt-1 text-xs text-slate-300">
-          Upload a flight, bus, hotel, transport, or activity PDF/image to pre-fill this form.
+          {description}
         </p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
           <label
@@ -380,7 +406,7 @@ export function AddBookingForm({
           autoComplete="off"
           className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-violet-300 focus:ring-2"
         >
-          {bookingTypes.map((type) => (
+          {availableTypes.map((type) => (
             <option key={type} value={type}>
               {type}
             </option>
@@ -437,33 +463,7 @@ export function AddBookingForm({
         </div>
       )}
 
-      {isHotelBooking ? (
-        <div className="space-y-3 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3">
-          <p className="text-sm text-emerald-100">
-            Hotel stay dates follow the trip dates by default.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-100">Start date</label>
-              <input
-                type="datetime-local"
-                value={selectedStartDate}
-                readOnly
-                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white opacity-90 outline-none"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-100">End date</label>
-              <input
-                type="datetime-local"
-                value={selectedEndDate}
-                readOnly
-                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white opacity-90 outline-none"
-              />
-            </div>
-          </div>
-        </div>
-      ) : isPersonalBooking ? null : (
+      {isHotelBooking ? null : isPersonalBooking ? null : (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
             <label htmlFor="booking-start" className="block text-sm font-medium text-slate-100">

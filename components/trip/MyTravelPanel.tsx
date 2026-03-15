@@ -75,7 +75,7 @@ function JourneyCard({
 
   return (
     <div className="overflow-hidden rounded-[22px] border border-cyan-400/15 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_32%),linear-gradient(180deg,rgba(10,22,38,0.98),rgba(4,10,20,0.98))] shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
-      <div className="flex items-center justify-between gap-3 border-b border-white/6 px-4 py-3">
+      <div className="border-b border-white/6 px-4 py-3">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-cyan-200">
             {title}
@@ -84,9 +84,6 @@ function JourneyCard({
             {route}
             <span className="ml-2 text-slate-300">{formattedDate}</span>
           </p>
-        </div>
-        <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">
-          Ticket snapshot
         </div>
       </div>
       <div className="grid gap-3 p-4 sm:grid-cols-3">
@@ -195,7 +192,7 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
                   title="Onward Journey"
                   route={
                     booking.onward_origin && booking.onward_destination
-                      ? `${booking.onward_origin} -> ${booking.onward_destination}`
+                      ? `${booking.onward_origin}-${booking.onward_destination}`
                       : "Route not detected"
                   }
                   dateTime={booking.onward_departure_at}
@@ -207,7 +204,7 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
                   title="Return Journey"
                   route={
                     booking.return_origin && booking.return_destination
-                      ? `${booking.return_origin} -> ${booking.return_destination}`
+                      ? `${booking.return_origin}-${booking.return_destination}`
                       : "Route not detected"
                   }
                   dateTime={booking.return_departure_at}

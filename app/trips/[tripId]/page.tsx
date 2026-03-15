@@ -119,9 +119,6 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
             bookingsContent={
               <BookingsTab
                 tripId={tripId}
-                members={members}
-                tripStartDate={trip.start_date}
-                tripEndDate={trip.end_date}
               />
             }
           />
