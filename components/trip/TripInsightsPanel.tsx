@@ -78,7 +78,7 @@ export function TripInsightsPanel({
 
       <section className="rounded-[28px] border border-amber-500/20 bg-[#020b16]/95 p-5 shadow-[0_30px_80px_rgba(1,6,17,0.55)] backdrop-blur">
         <h2 className="text-lg font-semibold text-white">Day-wise</h2>
-        <div className="mt-4 space-y-3">
+        <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pr-1">
           {dayWiseSummaries.length === 0 && (
             <p className="text-sm text-slate-300">No expenses added yet.</p>
           )}

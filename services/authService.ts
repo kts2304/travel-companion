@@ -7,6 +7,17 @@ export interface AuthUserSummary {
   email: string | null;
 }
 
+const AUTH_READ_TIMEOUT_MS = 2500;
+
+async function withAuthTimeout<T>(operation: Promise<T>, fallbackValue: T): Promise<T> {
+  return Promise.race([
+    operation,
+    new Promise<T>((resolve) => {
+      window.setTimeout(() => resolve(fallbackValue), AUTH_READ_TIMEOUT_MS);
+    }),
+  ]);
+}
+
 export async function signUpWithEmail(email: string, password: string): Promise<void> {
   const { error } = await supabase.auth.signUp({
     email: email.trim(),
@@ -29,7 +40,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
   }
 }
 
-export async function signInWithGitHub(redirectTo: string): Promise<void> {
+export async function signInWithGitHub(redirectTo: string): Promise<string> {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
@@ -44,6 +55,8 @@ export async function signInWithGitHub(redirectTo: string): Promise<void> {
   if (!data.url) {
     throw new Error("GitHub sign-in did not return a redirect URL.");
   }
+
+  return data.url;
 }
 
 export async function exchangeOAuthCodeForSession(code: string): Promise<void> {
@@ -63,19 +76,25 @@ export async function signOutCurrentUser(): Promise<void> {
 }
 
 export async function getCurrentAuthUser(): Promise<AuthUserSummary | null> {
-  const { data, error } = await supabase.auth.getUser();
+  const { data, error } = await withAuthTimeout(
+    supabase.auth.getSession(),
+    { data: { session: null }, error: null },
+  );
 
   if (error) {
-    throw new Error(error.message);
+    console.warn("[Auth] Unable to fetch current session:", error.message);
+    return null;
   }
 
-  if (!data.user) {
+  const sessionUser = data.session?.user;
+
+  if (!sessionUser) {
     return null;
   }
 
   return {
-    id: data.user.id,
-    email: data.user.email?.trim().toLowerCase() ?? null,
+    id: sessionUser.id,
+    email: sessionUser.email?.trim().toLowerCase() ?? null,
   };
 }
 

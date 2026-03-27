@@ -84,7 +84,8 @@ export function AuthPanel() {
 
     try {
       const redirectTo = `${window.location.origin}/auth/callback`;
-      await signInWithGitHub(redirectTo);
+      const githubUrl = await signInWithGitHub(redirectTo);
+      window.location.assign(githubUrl);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Unable to sign in with GitHub");
       setIsGitHubLoading(false);

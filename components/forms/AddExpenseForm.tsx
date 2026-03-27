@@ -35,13 +35,13 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
     register,
     handleSubmit,
     reset,
-    resetField,
     setValue,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<AddExpenseFormValues>({
     resolver: zodResolver(addExpenseSchema),
     defaultValues: {
+      totalAmount: 0,
       expenseDate: today,
       splitMemberIds: defaultSplitMemberIds,
     },
@@ -81,11 +81,11 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
 
       reset({
         description: "",
+        totalAmount: 0,
         expenseDate: today,
         paidByMemberId: "",
         splitMemberIds: defaultSplitMemberIds,
       });
-      resetField("totalAmount");
       router.refresh();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : "Unable to add expense");
