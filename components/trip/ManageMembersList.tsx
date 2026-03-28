@@ -74,24 +74,24 @@ function MemberCard({ member }: { member: Member }) {
 
   if (isEditing) {
     return (
-      <li className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-4">
+      <li className="rounded-[24px] border border-fuchsia-900/10 bg-white/88 p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
         <form onSubmit={handleSubmit(onSave)} autoComplete="off" className="space-y-3">
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-slate-100">Member name</label>
+            <label className="block text-sm font-bold text-[#35194f]">Member name</label>
             <input
               {...register("name")}
               autoComplete="off"
-              className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
+              className="w-full rounded-[20px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
           </div>
           <div className="space-y-1">
-            <label className="block text-sm font-medium text-slate-100">Email</label>
+            <label className="block text-sm font-bold text-[#35194f]">Email</label>
             <input
               type="email"
               {...register("email")}
               autoComplete="off"
-              className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
+              className="w-full rounded-[20px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           </div>
@@ -100,7 +100,7 @@ function MemberCard({ member }: { member: Member }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:opacity-60"
+              className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_28px_rgba(176,23,120,0.2)] transition hover:-translate-y-0.5 disabled:opacity-60"
             >
               {isSubmitting ? "Saving..." : "Save"}
             </button>
@@ -111,7 +111,7 @@ function MemberCard({ member }: { member: Member }) {
                 setActionError(null);
                 setIsEditing(false);
               }}
-              className="rounded-xl border border-slate-600 px-4 py-2 text-sm font-medium text-slate-200 transition hover:bg-slate-800"
+              className="rounded-full border border-fuchsia-900/12 bg-white px-4 py-2.5 text-sm font-medium text-[#5f4b73] transition hover:bg-fuchsia-50"
             >
               Cancel
             </button>
@@ -122,17 +122,17 @@ function MemberCard({ member }: { member: Member }) {
   }
 
   return (
-    <li className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-4">
+    <li className="rounded-[24px] border border-fuchsia-900/10 bg-white/88 p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="font-medium text-white">{member.name}</p>
-          {member.email && <p className="text-slate-300">{member.email}</p>}
+          <p className="text-lg font-extrabold tracking-[-0.02em] text-[#2f143f]">{member.name}</p>
+          {member.email && <p className="text-[#6a567b]">{member.email}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-500/20"
+            className="rounded-full border border-fuchsia-900/12 bg-[linear-gradient(135deg,#f4e4fb,#ffffff)] px-4 py-2.5 text-sm font-semibold text-[#5c2673] shadow-[0_12px_24px_rgba(118,60,145,0.1)] transition hover:-translate-y-0.5"
           >
             Edit
           </button>
@@ -140,7 +140,7 @@ function MemberCard({ member }: { member: Member }) {
             type="button"
             onClick={onDelete}
             disabled={isDeleting}
-            className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm font-medium text-rose-100 transition hover:bg-rose-500/20 disabled:opacity-60"
+            className="rounded-full border border-rose-300/60 bg-[linear-gradient(135deg,#fff1f5,#ffe2ea)] px-4 py-2.5 text-sm font-semibold text-rose-700 shadow-[0_12px_24px_rgba(225,29,72,0.08)] transition hover:-translate-y-0.5 disabled:opacity-60"
           >
             {isDeleting ? "Removing..." : "Remove"}
           </button>
@@ -154,7 +154,7 @@ function MemberCard({ member }: { member: Member }) {
 export function ManageMembersList({ members }: ManageMembersListProps) {
   return (
     <ul className="mt-3 space-y-2 text-sm">
-      {members.length === 0 && <li className="text-slate-300">No members added yet.</li>}
+      {members.length === 0 && <li className="text-[#6a567b]">No members added yet.</li>}
       {members.map((member) => (
         <MemberCard key={member.id} member={member} />
       ))}

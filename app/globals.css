@@ -1,19 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #020814;
-  --foreground: #f4fbff;
-  --panel: rgba(6, 23, 40, 0.82);
-  --panel-border: rgba(148, 163, 184, 0.16);
-  --accent: #36d3ff;
-  --accent-soft: rgba(54, 211, 255, 0.12);
+  --background: #efd0ee;
+  --foreground: #2f143f;
+  --panel: rgba(255, 255, 255, 0.74);
+  --panel-border: rgba(111, 60, 138, 0.14);
+  --accent: #c21884;
+  --accent-soft: rgba(194, 24, 132, 0.12);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Segoe UI Variable Display", "Aptos", "Trebuchet MS", "Helvetica Neue", sans-serif;
   --font-mono: "Cascadia Code", "Consolas", "Courier New", monospace;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -21,11 +25,25 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   background-image:
-    radial-gradient(circle at 10% 8%, rgba(54, 211, 255, 0.18), transparent 22%),
-    radial-gradient(circle at 86% 10%, rgba(111, 191, 255, 0.16), transparent 24%),
-    radial-gradient(circle at 52% 100%, rgba(32, 94, 194, 0.18), transparent 30%),
-    linear-gradient(180deg, #020814 0%, #06101d 42%, #081321 100%);
+    radial-gradient(circle at 8% 10%, rgba(255, 255, 255, 0.72), transparent 22%),
+    radial-gradient(circle at 82% 12%, rgba(246, 173, 255, 0.36), transparent 24%),
+    radial-gradient(circle at 72% 66%, rgba(194, 24, 132, 0.12), transparent 18%),
+    radial-gradient(circle at 18% 92%, rgba(255, 255, 255, 0.44), transparent 20%),
+    linear-gradient(180deg, #eec8eb 0%, #e7c0ea 40%, #ddb4e3 100%);
   min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(116, 56, 126, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(116, 56, 126, 0.05) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(circle at center, black 40%, transparent 84%);
+  opacity: 0.28;
 }
 
 a,
@@ -39,4 +57,72 @@ textarea {
     color 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
+}
+
+.travel-card-hover {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.travel-card-hover:hover {
+  transform: translateY(-4px);
+}
+
+.travel-float {
+  animation: travelFloat 8s ease-in-out infinite;
+}
+
+.travel-float-delayed {
+  animation: travelFloat 10s ease-in-out infinite;
+  animation-delay: -2.4s;
+}
+
+@keyframes travelFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+::selection {
+  background: rgba(194, 24, 132, 0.18);
+  color: #2f143f;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(194, 24, 132, 0.36) rgba(255, 255, 255, 0.46);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(194, 24, 132, 0.62), rgba(139, 29, 143, 0.3));
+  border: 2px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }

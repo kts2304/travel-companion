@@ -45,8 +45,8 @@ function JourneyField({
   const missing = value === "Not detected";
 
   return (
-    <div className="rounded-2xl border border-white/8 bg-[linear-gradient(180deg,rgba(9,16,30,0.95),rgba(5,10,22,0.98))] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-400">
+    <div className="rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(50,16,79,0.34),rgba(13,16,31,0.94))] px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-violet-100/70">
         {label}
       </p>
       <p className={`mt-2 text-sm font-medium leading-6 ${missing ? "text-slate-500" : "text-white"}`}>
@@ -72,21 +72,36 @@ function JourneyCard({
   pnr: string | null;
 }) {
   const formattedDate = dateTime ? formatBookingDate(dateTime) : "Not detected";
+  const isReturn = title.toLowerCase().includes("return");
 
   return (
-    <div className="overflow-hidden rounded-[22px] border border-cyan-400/15 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.12),transparent_32%),linear-gradient(180deg,rgba(10,22,38,0.98),rgba(4,10,20,0.98))] shadow-[0_18px_50px_rgba(0,0,0,0.28)]">
-      <div className="border-b border-white/6 px-4 py-3">
+    <div className="travel-card-hover relative overflow-hidden rounded-[28px] border border-fuchsia-400/18 bg-[linear-gradient(180deg,rgba(60,17,94,0.92),rgba(29,10,47,0.94)_42%,rgba(9,12,24,0.98)_100%)] shadow-[0_22px_60px_rgba(0,0,0,0.3)]">
+      <div className="absolute -left-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-[#08131f]" />
+      <div className="absolute -right-3 top-1/2 h-6 w-6 -translate-y-1/2 rounded-full bg-[#08131f]" />
+      <div className="absolute inset-x-10 top-[74px] border-t border-dashed border-white/20" />
+      <div className="absolute right-4 top-4 rounded-full border border-white/12 bg-white/6 p-2 text-fuchsia-100/70">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+          {isReturn ? (
+            <path d="M20 16v4h-4M4 8V4h4M19 20c-1.7-3.4-5.2-6-9-6H4M5 4c1.7 3.4 5.2 6 9 6h6" />
+          ) : (
+            <path d="M3 12h12M11 6l6 6-6 6M21 6v12" />
+          )}
+        </svg>
+      </div>
+      <div className="border-b border-white/8 px-5 py-4">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.26em] text-cyan-200">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-100/90">
             {title}
           </p>
-          <p className="mt-1 text-sm font-medium text-white">
+          <p className="mt-2 text-base font-semibold tracking-[-0.02em] text-white">
             {route}
-            <span className="ml-2 text-slate-300">{formattedDate}</span>
+          </p>
+          <p className="mt-1 text-sm text-violet-100/85">
+            {formattedDate}
           </p>
         </div>
       </div>
-      <div className="grid gap-3 p-4 sm:grid-cols-3">
+      <div className="grid gap-3 p-5 sm:grid-cols-3">
         <JourneyField label="Flight Number" value={formatJourneyValue(flightNumber)} />
         <JourneyField label="Seat Number" value={formatJourneyValue(seatNumber)} />
         <JourneyField label="Booking / PNR" value={formatJourneyValue(pnr)} />
@@ -140,16 +155,16 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
   }, [currentMember, personalBookings]);
 
   return (
-    <section className="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-4">
+    <section className="rounded-[30px] border border-fuchsia-400/16 bg-[linear-gradient(180deg,rgba(71,20,109,0.14),rgba(5,11,22,0.96))] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.28)]">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-white">My Travel</h3>
-          <p className="text-sm text-slate-300">
+          <h3 className="text-xl font-semibold tracking-[-0.03em] text-white">My Travel</h3>
+          <p className="text-sm leading-6 text-slate-300">
             Flight and bus tickets stay personal and resolve from the signed-in traveler.
           </p>
         </div>
         {currentMember && (
-          <p className="rounded-full bg-cyan-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-200">
+          <p className="rounded-full border border-fuchsia-400/20 bg-fuchsia-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-100">
             {currentMember.name}
           </p>
         )}
@@ -177,12 +192,24 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
 
       <div className="mt-4 space-y-3">
         {myBookings.map(({ booking, documents }) => (
-          <div key={booking.id} className="rounded-[24px] border border-cyan-500/20 bg-[linear-gradient(180deg,rgba(10,18,34,0.96),rgba(6,12,24,0.98))] p-5 shadow-[0_18px_60px_rgba(0,0,0,0.24)]">
+          <div key={booking.id} className="travel-card-hover rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(13,20,38,0.96),rgba(6,12,24,0.98))] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.26)]">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
-                {formatBookingType(booking.type)}
-              </p>
-              <h4 className="mt-1 text-lg font-semibold text-white">
+              <div className="inline-flex items-center gap-2 rounded-full border border-fuchsia-400/16 bg-fuchsia-400/8 px-3 py-1.5 text-fuchsia-100/85">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  {booking.type === "flight" ? (
+                    <path d="M2 16l20-8-8 20-2-8-8-4zM12 20l-2-8" />
+                  ) : (
+                    <>
+                      <rect x="4" y="6" width="16" height="11" rx="2" />
+                      <path d="M7 17v2M17 17v2M8 10h8" />
+                    </>
+                  )}
+                </svg>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em]">
+                  {formatBookingType(booking.type)}
+                </p>
+              </div>
+              <h4 className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">
                 {currentMember?.name ?? "Traveler ticket"}
               </h4>
             </div>

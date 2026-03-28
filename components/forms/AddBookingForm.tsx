@@ -355,17 +355,17 @@ export function AddBookingForm({
     <form
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
-      className="space-y-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-5 shadow-[0_20px_60px_rgba(1,6,17,0.28)]"
+      className="space-y-4 rounded-[32px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,239,250,0.9))] p-5 shadow-[0_20px_34px_rgba(118,60,145,0.14)]"
     >
-      <div className="rounded-xl border border-violet-500/25 bg-violet-500/10 p-4">
-        <p className="text-sm font-medium text-violet-200">{heading}</p>
-        <p className="mt-1 text-xs text-slate-300">
+      <div className="rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(72,21,104,0.92),rgba(95,23,120,0.92))] p-4 shadow-[0_16px_30px_rgba(118,60,145,0.16)]">
+        <p className="text-sm font-medium text-white">{heading}</p>
+        <p className="mt-1 text-xs text-white/78">
           {description}
         </p>
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
           <label
             htmlFor={fileInputId}
-            className="inline-flex cursor-pointer items-center rounded-lg bg-violet-500/20 px-3 py-2 text-sm font-medium text-violet-100 transition hover:bg-violet-500/30"
+            className="inline-flex shrink-0 cursor-pointer items-center rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-fuchsia-900 shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5"
           >
             Choose file
           </label>
@@ -381,30 +381,30 @@ export function AddBookingForm({
               setExtractSuccess(null);
             }}
           />
-          <p className="text-sm text-slate-300">
+          <p className="min-w-0 flex-1 truncate text-sm text-white/80" title={selectedDocument ? selectedDocument.name : "No file selected"}>
             {selectedDocument ? selectedDocument.name : "No file selected"}
           </p>
           <button
             type="button"
             onClick={onExtract}
             disabled={isExtracting}
-            className="rounded-lg bg-violet-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-violet-400 disabled:opacity-60"
+            className="shrink-0 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-fuchsia-900 shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5 disabled:opacity-60"
           >
             {isExtracting ? "Extracting..." : "Extract details"}
           </button>
         </div>
-        {extractSuccess && <p className="mt-3 text-sm text-emerald-300">{extractSuccess}</p>}
+        {extractSuccess && <p className="mt-3 text-sm text-emerald-100">{extractSuccess}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="booking-type" className="block text-sm font-medium text-slate-100">
+        <label htmlFor="booking-type" className="block text-sm font-medium text-[#35194f]">
           Booking type
         </label>
         <select
           id="booking-type"
           {...register("type")}
           autoComplete="off"
-          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-violet-300 focus:ring-2"
+          className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
         >
           {availableTypes.map((type) => (
             <option key={type} value={type}>
@@ -415,7 +415,7 @@ export function AddBookingForm({
         {errors.type && <p className="text-sm text-red-600">{errors.type.message}</p>}
       </div>
 
-      <div className="rounded-xl border border-slate-700 bg-[#06111d] px-4 py-3 text-sm text-slate-200">
+      <div className="rounded-[24px] border border-white/70 bg-white/82 px-4 py-3 text-sm text-[#5a4670]">
         {isPersonalBooking ? (
           <p>
             {selectedType === "flight" ? "Flight tickets" : "Bus tickets"} are stored as
@@ -428,26 +428,26 @@ export function AddBookingForm({
 
       {isPersonalBooking && (
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-slate-100">Traveler</label>
+          <label className="block text-sm font-medium text-[#35194f]">Traveler</label>
           {isLoadingUser ? (
-            <div className="rounded-xl border border-slate-700 bg-[#06111d] px-4 py-3 text-sm text-slate-300">
+            <div className="rounded-[22px] border border-white/70 bg-white/92 px-4 py-3 text-sm text-[#6c567f]">
               Checking signed-in traveler...
             </div>
           ) : currentMember ? (
-            <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/10 px-4 py-3 text-sm text-cyan-50">
+            <div className="rounded-[22px] border border-white/70 bg-[linear-gradient(180deg,rgba(72,21,104,0.92),rgba(95,23,120,0.92))] px-4 py-3 text-sm text-white">
               {currentMember.name}
               {currentMember.email ? ` (${currentMember.email})` : ""}
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              <div className="rounded-[22px] border border-white/70 bg-white/92 px-4 py-3 text-sm text-[#7a5d2a]">
                 No signed-in trip member match found. Select the traveler manually for now.
               </div>
               <select
                 id="booking-member"
                 {...register("memberId")}
                 autoComplete="off"
-                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-violet-300 focus:ring-2"
+                className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
               >
                 <option value="">Select traveler</option>
                 {members.map((member) => (
@@ -466,7 +466,7 @@ export function AddBookingForm({
       {isHotelBooking ? null : isPersonalBooking ? null : (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <label htmlFor="booking-start" className="block text-sm font-medium text-slate-100">
+            <label htmlFor="booking-start" className="block text-sm font-bold text-[#35194f]">
               Start date
             </label>
             <input
@@ -474,13 +474,13 @@ export function AddBookingForm({
               type="datetime-local"
               {...register("startDate")}
               autoComplete="off"
-              className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-violet-300 focus:ring-2"
+              className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.startDate && <p className="text-sm text-red-600">{errors.startDate.message}</p>}
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="booking-end" className="block text-sm font-medium text-slate-100">
+            <label htmlFor="booking-end" className="block text-sm font-bold text-[#35194f]">
               End date
             </label>
             <input
@@ -488,7 +488,7 @@ export function AddBookingForm({
               type="datetime-local"
               {...register("endDate")}
               autoComplete="off"
-              className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-violet-300 focus:ring-2"
+              className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
             />
           </div>
         </div>
@@ -510,12 +510,12 @@ export function AddBookingForm({
       <input type="hidden" {...register("returnSeatNumber")} />
       <input type="hidden" {...register("returnPnr")} />
 
-      {submitError && <p className="text-sm text-red-600">{submitError}</p>}
+      {submitError && <p className="text-sm text-rose-700">{submitError}</p>}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-xl bg-violet-600 px-4 py-2.5 font-semibold text-white shadow-md transition hover:bg-violet-700 disabled:opacity-60"
+        className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-6 py-3 font-semibold text-white shadow-[0_18px_34px_rgba(176,23,120,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(176,23,120,0.3)] disabled:opacity-60"
       >
         {isSubmitting ? "Adding..." : "Add booking"}
       </button>

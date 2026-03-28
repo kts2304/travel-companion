@@ -12,19 +12,22 @@ const hubCards = [
     key: "flights",
     title: "Flights & Transport",
     description: "Personal flight tickets, bus travel, and shared transport bookings.",
-    accent: "border-cyan-500/20 bg-cyan-500/10",
+    accent: "border-white/75 bg-[linear-gradient(180deg,rgba(72,21,104,0.94),rgba(95,23,120,0.94))] text-white",
+    label: "Personal",
   },
   {
     key: "hotels",
     title: "Hotels",
     description: "Stay details, room information, vouchers, and hotel references.",
-    accent: "border-emerald-500/20 bg-emerald-500/10",
+    accent: "border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,239,250,0.9))] text-[#35194f]",
+    label: "Shared",
   },
   {
     key: "activities",
     title: "Activities & Itinerary",
     description: "Planned events, time slots, notes, and supporting activity documents.",
-    accent: "border-violet-500/20 bg-violet-500/10",
+    accent: "border-white/75 bg-[linear-gradient(180deg,rgba(72,21,104,0.94),rgba(95,23,120,0.94))] text-white",
+    label: "Plan",
   },
 ] as const;
 
@@ -42,33 +45,37 @@ export function BookingsHub({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-2xl border border-slate-700 bg-slate-900/90 p-5 shadow-[0_20px_60px_rgba(1,6,17,0.28)]">
-        <h3 className="text-lg font-semibold text-white">Bookings Hub</h3>
-        <p className="mt-2 text-sm leading-6 text-slate-300">
+      <section className="rounded-[30px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,239,250,0.9))] p-5 shadow-[0_18px_34px_rgba(118,60,145,0.12)]">
+        <h3 className="text-xl font-black tracking-[-0.03em] text-[#35194f]">Bookings Hub</h3>
+        <p className="mt-2 text-sm leading-6 text-[#6c567f]">
           Keep the overview clean here, then open the booking area you want to work on.
         </p>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="space-y-4">
         {hubCards.map((card) => (
           <Link
             key={card.key}
             href={`/trips/${tripId}/bookings/${card.key}`}
-            className={`rounded-[24px] border p-5 shadow-[0_18px_60px_rgba(0,0,0,0.24)] transition hover:-translate-y-0.5 hover:border-white/20 ${card.accent}`}
+            className={`block rounded-[30px] border p-5 shadow-[0_18px_34px_rgba(118,60,145,0.14)] transition hover:-translate-y-1 hover:shadow-[0_24px_44px_rgba(118,60,145,0.18)] ${card.accent}`}
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-200">
-                  Bookings
+            <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-current/70">
+                  {card.label}
                 </p>
-                <h4 className="mt-3 text-xl font-semibold text-white">{card.title}</h4>
+                <h4 className="mt-3 text-2xl font-semibold tracking-[-0.03em] text-current">{card.title}</h4>
+                <p className="mt-4 max-w-2xl text-sm leading-7 text-current/82">{card.description}</p>
               </div>
-              <span className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-1 text-xs font-medium text-slate-200">
-                {countByKey[card.key]}
-              </span>
+              <div className="flex items-center justify-between gap-4 md:w-auto md:flex-col md:items-end">
+                <span className="rounded-full border border-current/10 bg-white/25 px-3 py-1 text-xs font-medium text-current shadow-[inset_0_1px_0_rgba(255,255,255,0.14)]">
+                  {countByKey[card.key]}
+                </span>
+                <span className="rounded-full border border-current/12 bg-white/20 px-4 py-2 text-sm font-semibold text-current">
+                  Open section
+                </span>
+              </div>
             </div>
-            <p className="mt-4 text-sm leading-6 text-slate-200">{card.description}</p>
-            <p className="mt-5 text-sm font-medium text-white">Open section</p>
           </Link>
         ))}
       </section>

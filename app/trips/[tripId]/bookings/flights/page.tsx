@@ -57,6 +57,7 @@ export default async function FlightsTransportPage({ params }: FlightsTransportP
       eyebrow="Bookings / Flights & Transport"
       title="Flights & Transport"
       description="Use this page for personal flight and bus tickets plus shared transport details, while keeping the bookings hub clean."
+      artVariant="flights"
     >
       <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
         <AddBookingForm
@@ -72,30 +73,37 @@ export default async function FlightsTransportPage({ params }: FlightsTransportP
         <div className="space-y-6">
           <MyTravelPanel members={members} personalBookings={personalBookings} />
 
-          <section className="rounded-[24px] border border-cyan-500/20 bg-cyan-500/10 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.24)]">
-            <h2 className="text-lg font-semibold text-white">Shared Transport</h2>
-            <p className="mt-2 text-sm text-slate-300">
+          <section className="travel-card-hover rounded-[28px] border border-fuchsia-400/18 bg-[linear-gradient(180deg,rgba(65,24,95,0.92),rgba(20,14,40,0.96))] p-5 shadow-[0_22px_60px_rgba(61,18,89,0.22)]">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-fuchsia-200/16 bg-white/8 text-fuchsia-100">
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <path d="M4 15h16M6 15V9h12v6M8 19v-4M16 19v-4M7 11h2m6 0h2" />
+                </svg>
+              </span>
+              <h2 className="text-lg font-semibold text-white">Shared Transport</h2>
+            </div>
+            <p className="mt-2 text-sm text-fuchsia-100/78">
               Cabs, airport pickups, and local transport details that belong to the whole trip.
             </p>
             <div className="mt-4 space-y-3">
               {sharedTransportBookings.length === 0 && (
-                <p className="text-sm text-slate-300">No shared transport bookings added yet.</p>
+                <p className="text-sm text-fuchsia-100/72">No shared transport bookings added yet.</p>
               )}
               {sharedTransportBookings.map(({ booking, documents }) => (
                 <div
                   key={booking.id}
-                  className="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+                  className="travel-card-hover rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,35,0.92),rgba(6,12,24,0.98))] p-4"
                 >
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-100/78">
                         Transport
                       </p>
                       <h3 className="mt-1 text-base font-semibold text-white">{booking.title}</h3>
                     </div>
-                    <p className="text-sm text-slate-300">{formatDate(booking.start_date)}</p>
+                    <p className="text-sm text-fuchsia-100/70">{formatDate(booking.start_date)}</p>
                   </div>
-                  {booking.notes && <p className="mt-3 text-sm leading-6 text-slate-200">{booking.notes}</p>}
+                  {booking.notes && <p className="mt-3 text-sm leading-6 text-fuchsia-50/88">{booking.notes}</p>}
                   <BookingDocumentsPanel bookingId={booking.id} documents={documents} />
                   <DeleteBookingButton
                     bookingId={booking.id}

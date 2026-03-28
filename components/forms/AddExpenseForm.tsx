@@ -96,23 +96,23 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
     <form
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
-      className="space-y-4 rounded-2xl border border-slate-700 bg-slate-900/90 p-5 shadow-[0_20px_60px_rgba(1,6,17,0.28)]"
+      className="space-y-4 rounded-[28px] border border-fuchsia-900/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,239,250,0.92))] p-5 shadow-[0_20px_36px_rgba(118,60,145,0.12)]"
     >
       <div className="space-y-1">
-        <label htmlFor="expense-description" className="block text-sm font-medium text-slate-100">
+        <label htmlFor="expense-description" className="block text-sm font-bold text-[#35194f]">
           Description
         </label>
         <input
           id="expense-description"
           {...register("description")}
           autoComplete="off"
-          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-amber-300 focus:ring-2"
+          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-amber-300 focus:ring-2"
         />
         {errors.description && <p className="text-sm text-red-600">{errors.description.message}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="expense-total" className="block text-sm font-medium text-slate-100">
+        <label htmlFor="expense-total" className="block text-sm font-bold text-[#35194f]">
           Total amount
         </label>
         <input
@@ -122,13 +122,13 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
           step="0.01"
           {...register("totalAmount", { valueAsNumber: true })}
           autoComplete="off"
-          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-amber-300 focus:ring-2"
+          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-amber-300 focus:ring-2"
         />
         {errors.totalAmount && <p className="text-sm text-red-600">{errors.totalAmount.message}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="expense-date" className="block text-sm font-medium text-slate-100">
+        <label htmlFor="expense-date" className="block text-sm font-bold text-[#35194f]">
           Expense date
         </label>
         <input
@@ -136,20 +136,20 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
           type="date"
           {...register("expenseDate")}
           autoComplete="off"
-          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-amber-300 focus:ring-2"
+          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-amber-300 focus:ring-2"
         />
         {errors.expenseDate && <p className="text-sm text-red-600">{errors.expenseDate.message}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="expense-paid-by" className="block text-sm font-medium text-slate-100">
+        <label htmlFor="expense-paid-by" className="block text-sm font-bold text-[#35194f]">
           Paid by
         </label>
         <select
           id="expense-paid-by"
           {...register("paidByMemberId")}
           autoComplete="off"
-          className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-amber-300 focus:ring-2"
+          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-amber-300 focus:ring-2"
           defaultValue=""
         >
           <option value="" disabled>
@@ -165,15 +165,15 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
       </div>
 
       <fieldset className="space-y-1">
-        <legend className="text-sm font-medium text-slate-100">Split among</legend>
-        <p className="text-xs text-slate-300">
+        <legend className="text-sm font-bold text-[#35194f]">Split among</legend>
+        <p className="text-xs text-[#6a567b]">
           Payer is excluded automatically. Leave all unchecked for personal expense.
         </p>
         <div className="space-y-1">
           {members.map((member) => (
             <label
               key={member.id}
-              className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-sm text-slate-100"
+              className="flex items-center gap-2 rounded-[18px] border border-amber-400/25 bg-[linear-gradient(180deg,rgba(255,248,232,0.96),rgba(255,241,206,0.88))] px-3 py-2 text-sm font-medium text-[#6d4a14]"
             >
               <input
                 type="checkbox"
@@ -193,7 +193,7 @@ export function AddExpenseForm({ tripId, members }: AddExpenseFormProps) {
       <button
         type="submit"
         disabled={isSubmitting || members.length === 0}
-        className="rounded-xl bg-amber-500 px-4 py-2.5 font-semibold text-slate-900 shadow-md transition hover:bg-amber-400 disabled:opacity-60"
+        className="rounded-full bg-[linear-gradient(135deg,#f2a93b,#dd7c18)] px-5 py-3 font-semibold text-[#351f08] shadow-[0_18px_34px_rgba(221,124,24,0.2)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(221,124,24,0.26)] disabled:opacity-60"
       >
         {isSubmitting ? "Adding..." : "Add expense"}
       </button>

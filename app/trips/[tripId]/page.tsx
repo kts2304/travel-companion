@@ -84,12 +84,29 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
   return (
     <main className="min-h-screen px-4 py-6 sm:px-6 xl:px-8">
       <div className="mx-auto max-w-[1500px]">
-        <div className="mb-5 flex items-center justify-between gap-4 rounded-[28px] border border-slate-700/90 bg-[#020b16]/95 px-5 py-4 shadow-[0_30px_80px_rgba(1,6,17,0.55)] backdrop-blur">
+        <div className="relative mb-5 overflow-hidden rounded-[36px] border border-white/70 bg-[linear-gradient(180deg,rgba(78,24,109,0.95),rgba(58,19,87,0.96))] px-5 py-5 shadow-[0_24px_48px_rgba(118,60,145,0.18)] backdrop-blur">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 overflow-hidden text-fuchsia-100/10"
+          >
+            <div className="travel-float absolute -right-8 top-4 h-28 w-28 rounded-full bg-current blur-3xl" />
+            <svg
+              viewBox="0 0 360 140"
+              className="travel-float-delayed absolute right-20 top-0 h-32 w-72"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3.5"
+            >
+              <path d="M20 96c52-40 110-58 182-58 54 0 96 10 138 26" />
+              <path d="M154 18l18 30 50 10-40 12-10 30-18-24-52 6 36-16-10-24z" />
+            </svg>
+          </div>
+          <div className="relative z-10 flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/70">
               Travel Companion
             </p>
-            <p className="mt-1 text-sm text-slate-300">
+            <p className="mt-2 text-sm text-white/80">
               Trip workspace for members, expenses, bookings, and settlement visibility
             </p>
           </div>
@@ -97,14 +114,15 @@ export default async function TripDetailsPage({ params }: TripDetailsPageProps) 
             <AuthStatus />
             <Link
               href="/"
-              className="rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-cyan-400/60 hover:text-white"
+              className="rounded-full border border-white/16 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-white/16"
             >
               Exit workspace
             </Link>
           </div>
+          </div>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[260px_minmax(0,1fr)_360px]">
+        <div className="grid gap-5 xl:grid-cols-[280px_minmax(0,1fr)_370px]">
           <TripWorkspaceSidebar
             trip={trip}
             memberCount={members.length}

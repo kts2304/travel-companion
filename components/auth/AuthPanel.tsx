@@ -109,24 +109,26 @@ export function AuthPanel() {
   };
 
   return (
-    <section className="rounded-[28px] border border-slate-700/90 bg-[#020b16]/95 p-5 shadow-[0_30px_80px_rgba(1,6,17,0.55)] backdrop-blur">
+    <section className="overflow-hidden rounded-[34px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(249,240,251,0.92))] p-5 shadow-[0_22px_40px_rgba(118,60,145,0.14)] backdrop-blur">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-200">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-900/60">
             App Access
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-white">Sign in to unlock My Travel</h2>
+          <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-[#35194f]">
+            Sign in to unlock My Travel
+          </h2>
         </div>
       </div>
 
       {isLoadingUser ? (
-        <p className="mt-3 text-sm leading-6 text-slate-300">Checking current session...</p>
+        <p className="mt-3 text-sm leading-6 text-[#6c567f]">Checking current session...</p>
       ) : currentUser ? (
-        <div className="mt-4 rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-4">
-          <p className="text-sm font-medium text-cyan-100">
+        <div className="mt-4 rounded-[24px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,239,250,0.9))] p-4 shadow-[0_16px_28px_rgba(118,60,145,0.1)]">
+          <p className="text-sm font-medium text-[#35194f]">
             Signed in as {currentUser.email ?? "your account"}
           </p>
-          <p className="mt-2 text-sm leading-6 text-slate-300">
+          <p className="mt-2 text-sm leading-6 text-[#6c567f]">
             You can go ahead and create or open a trip. Personal travel items will use this account
             for traveler matching.
           </p>
@@ -135,18 +137,18 @@ export function AuthPanel() {
               type="button"
               onClick={onSignOut}
               disabled={isSigningOut}
-              className="rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-cyan-400/60 hover:text-white disabled:opacity-60"
+              className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(176,23,120,0.2)] transition hover:-translate-y-0.5 disabled:opacity-60"
             >
               {isSigningOut ? "Signing out..." : "Sign out of app"}
             </button>
-            <p className="text-xs leading-5 text-slate-400">
+            <p className="text-xs leading-5 text-[#7c6790]">
               This signs you out of Travel Companion only, not GitHub itself.
             </p>
           </div>
         </div>
       ) : (
         <>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
+          <p className="mt-3 text-sm leading-6 text-[#6c567f]">
             Use the same email that you add as a trip member. That is how the app knows which
             personal ticket belongs to you.
           </p>
@@ -161,10 +163,10 @@ export function AuthPanel() {
                   setErrorMessage(null);
                   setStatusMessage(null);
                 }}
-                className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
+                className={`rounded-2xl px-4 py-2.5 text-sm font-semibold transition ${
                   mode === authMode
-                    ? "bg-cyan-400 text-slate-950"
-                    : "bg-slate-900/80 text-slate-200 hover:bg-slate-800"
+                    ? "bg-[linear-gradient(135deg,#4a1f68,#7b2b8e)] text-white shadow-[0_16px_28px_rgba(39,4,58,0.16)]"
+                    : "bg-fuchsia-50 text-[#6c567f] hover:bg-fuchsia-100 hover:text-[#35194f]"
                 }`}
               >
                 {authMode === "sign-in" ? "Sign in" : "Create account"}
@@ -177,18 +179,18 @@ export function AuthPanel() {
               type="button"
               onClick={onGitHubSignIn}
               disabled={isGitHubLoading || isSubmitting}
-              className="inline-flex w-full items-center justify-center rounded-xl border border-slate-600 bg-slate-900/90 px-4 py-2.5 text-sm font-semibold text-white transition hover:border-cyan-400/60 hover:text-cyan-100 disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[linear-gradient(135deg,#4a1f68,#7b2b8e)] px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(74,31,104,0.18)] transition hover:-translate-y-0.5 disabled:opacity-60"
             >
               {isGitHubLoading ? "Redirecting to GitHub..." : "Continue with GitHub"}
             </button>
-            <p className="mt-2 text-xs leading-5 text-slate-400">
+            <p className="mt-2 text-xs leading-5 text-[#7c6790]">
               Recommended if your Supabase project already uses GitHub for auth.
             </p>
           </div>
 
           <form onSubmit={onSubmit} autoComplete="off" className="mt-5 space-y-4">
             <div className="space-y-1">
-              <label htmlFor="auth-email" className="block text-sm font-medium text-slate-100">
+              <label htmlFor="auth-email" className="block text-sm font-bold text-[#35194f]">
                 Email
               </label>
               <input
@@ -197,12 +199,12 @@ export function AuthPanel() {
                 value={email}
                 autoComplete="off"
                 onChange={(event) => setEmail(event.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
+                className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
               />
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="auth-password" className="block text-sm font-medium text-slate-100">
+              <label htmlFor="auth-password" className="block text-sm font-bold text-[#35194f]">
                 Password
               </label>
               <input
@@ -211,17 +213,17 @@ export function AuthPanel() {
                 value={password}
                 autoComplete="new-password"
                 onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-xl border border-slate-700 bg-[#06111d] p-2.5 text-white outline-none ring-cyan-300 focus:ring-2"
+                className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
               />
             </div>
 
-            {errorMessage && <p className="text-sm text-red-400">{errorMessage}</p>}
-            {statusMessage && <p className="text-sm text-emerald-300">{statusMessage}</p>}
+            {errorMessage && <p className="text-sm text-rose-700">{errorMessage}</p>}
+            {statusMessage && <p className="text-sm text-emerald-700">{statusMessage}</p>}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-cyan-400 px-4 py-2.5 font-semibold text-slate-950 shadow-[0_0_36px_rgba(54,211,255,0.22)] transition hover:bg-cyan-300 disabled:opacity-60"
+              className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-5 py-3 font-semibold text-white shadow-[0_18px_34px_rgba(176,23,120,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(176,23,120,0.3)] disabled:opacity-60"
             >
               {isSubmitting
                 ? mode === "sign-in"

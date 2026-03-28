@@ -78,6 +78,7 @@ export default async function HotelsPage({ params }: HotelsPageProps) {
       eyebrow="Bookings / Hotels"
       title="Hotels"
       description="Keep hotel stays structured here with room details, place, trip dates, and uploaded hotel vouchers."
+      artVariant="hotels"
     >
       <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
         <AddBookingForm
@@ -90,16 +91,23 @@ export default async function HotelsPage({ params }: HotelsPageProps) {
           description="Upload hotel confirmations here. Trip dates are used as the default hotel stay window."
         />
 
-        <section className="rounded-[24px] border border-emerald-500/20 bg-emerald-500/10 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.24)]">
-          <h2 className="text-lg font-semibold text-white">Hotel Stays</h2>
+        <section className="travel-card-hover rounded-[28px] border border-emerald-500/18 bg-[linear-gradient(180deg,rgba(20,88,73,0.92),rgba(13,31,30,0.96))] p-5 shadow-[0_22px_60px_rgba(17,71,60,0.2)]">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-emerald-100/16 bg-white/8 text-emerald-50">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M5 20V7l7-3 7 3v13M9 20v-4h6v4M9 9h1M14 9h1M9 12h1M14 12h1" />
+              </svg>
+            </span>
+            <h2 className="text-lg font-semibold text-white">Hotel Stays</h2>
+          </div>
           <div className="mt-4 space-y-3">
             {hotelsWithDocuments.length === 0 && (
-              <p className="text-sm text-slate-300">No hotel bookings added yet.</p>
+              <p className="text-sm text-emerald-50/78">No hotel bookings added yet.</p>
             )}
             {hotelsWithDocuments.map(({ booking, documents }) => (
               <div
                 key={booking.id}
-                className="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+                className="travel-card-hover rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(10,18,35,0.92),rgba(6,12,24,0.98))] p-4"
               >
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
@@ -110,26 +118,26 @@ export default async function HotelsPage({ params }: HotelsPageProps) {
                       {booking.hotel_name ?? booking.title}
                     </h3>
                   </div>
-                  <p className="text-sm text-slate-300">
-                    {formatDate(booking.start_date)}
-                    {booking.end_date ? ` to ${formatDate(booking.end_date)}` : ""}
-                  </p>
-                </div>
+                    <p className="text-sm text-emerald-50/70">
+                      {formatDate(booking.start_date)}
+                      {booking.end_date ? ` to ${formatDate(booking.end_date)}` : ""}
+                    </p>
+                  </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                  <div className="rounded-xl border border-white/8 bg-slate-900/80 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  <div className="rounded-xl border border-white/8 bg-white/8 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-50/56">
                       Place
                     </p>
                     <p className="mt-2 text-sm font-medium text-white">{booking.place ?? "Not detected"}</p>
                   </div>
-                  <div className="rounded-xl border border-white/8 bg-slate-900/80 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  <div className="rounded-xl border border-white/8 bg-white/8 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-50/56">
                       Room Details
                     </p>
                     <p className="mt-2 text-sm font-medium text-white">{booking.room_number ?? "Not detected"}</p>
                   </div>
-                  <div className="rounded-xl border border-white/8 bg-slate-900/80 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  <div className="rounded-xl border border-white/8 bg-white/8 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-50/56">
                       Trip Dates
                     </p>
                     <p className="mt-2 text-sm font-medium text-white">
@@ -139,8 +147,8 @@ export default async function HotelsPage({ params }: HotelsPageProps) {
                   </div>
                 </div>
                 {getHotelStayGroups(booking.notes).length > 0 && (
-                  <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200">
+                  <div className="mt-4 rounded-xl border border-emerald-500/20 bg-emerald-500/8 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
                       Room-wise Stay Breakdown
                     </p>
                     <div className="mt-3 space-y-2">

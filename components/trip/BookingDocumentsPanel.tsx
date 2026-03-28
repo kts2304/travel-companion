@@ -53,12 +53,15 @@ export function BookingDocumentsPanel({
   };
 
   return (
-    <div className="mt-4 rounded-xl border border-violet-500/20 bg-slate-950/70 p-4">
+    <div className="travel-card-hover mt-4 rounded-2xl border border-violet-500/20 bg-slate-950/70 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <label
           htmlFor={inputId}
-          className="inline-flex cursor-pointer items-center rounded-lg bg-violet-500/20 px-3 py-2 text-sm font-medium text-violet-100 transition hover:bg-violet-500/30"
+          className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-violet-500/20 px-4 py-2.5 text-sm font-medium text-violet-100 transition hover:bg-violet-500/30"
         >
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 16V4M7 9l5-5 5 5M5 20h14" />
+          </svg>
           Choose document
         </label>
         <input
@@ -77,7 +80,7 @@ export function BookingDocumentsPanel({
         <select
           value={documentKind}
           onChange={(event) => setDocumentKind(event.target.value as BookingDocumentKind)}
-          className="rounded-lg border border-slate-700 bg-[#06111d] px-3 py-2 text-sm text-white outline-none ring-violet-300 focus:ring-2"
+          className="rounded-full border border-slate-700 bg-[#06111d] px-4 py-2.5 text-sm text-white outline-none ring-violet-300 focus:ring-2"
         >
           <option value="checkin">Check-in document</option>
           <option value="booking">Booking document</option>
@@ -86,7 +89,7 @@ export function BookingDocumentsPanel({
           type="button"
           onClick={onUpload}
           disabled={isUploading}
-          className="rounded-lg bg-violet-500 px-3 py-2 text-sm font-semibold text-white transition hover:bg-violet-400 disabled:opacity-60"
+          className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_28px_rgba(176,23,120,0.2)] transition hover:-translate-y-0.5 disabled:opacity-60"
         >
           {isUploading ? "Uploading..." : "Upload"}
         </button>
@@ -106,7 +109,7 @@ export function BookingDocumentsPanel({
             {bookingDocuments.map((document) => (
               <div
                 key={document.id}
-                className="flex flex-col gap-2 rounded-lg border border-violet-500/15 bg-violet-500/10 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="travel-card-hover flex flex-col gap-2 rounded-xl border border-violet-500/15 bg-violet-500/10 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <p className="break-all text-sm text-slate-200">{getDocumentLabel(document.file_url)}</p>
                 <div className="flex gap-3 text-sm">
@@ -142,7 +145,7 @@ export function BookingDocumentsPanel({
             {checkinDocuments.map((document) => (
               <div
                 key={document.id}
-                className="flex flex-col gap-2 rounded-lg border border-cyan-500/15 bg-cyan-500/10 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                className="travel-card-hover flex flex-col gap-2 rounded-xl border border-cyan-500/15 bg-cyan-500/10 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
               >
                 <p className="break-all text-sm text-slate-200">{getDocumentLabel(document.file_url)}</p>
                 <div className="flex gap-3 text-sm">
