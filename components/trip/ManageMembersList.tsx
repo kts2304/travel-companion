@@ -74,24 +74,24 @@ function MemberCard({ member }: { member: Member }) {
 
   if (isEditing) {
     return (
-      <li className="rounded-[24px] border border-fuchsia-900/10 bg-white/88 p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
+      <li className="theme-card rounded-[24px] border p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
         <form onSubmit={handleSubmit(onSave)} autoComplete="off" className="space-y-3">
           <div className="space-y-1">
-            <label className="block text-sm font-bold text-[#35194f]">Member name</label>
+            <label className="theme-heading block text-sm font-bold">Member name</label>
             <input
               {...register("name")}
               autoComplete="off"
-              className="w-full rounded-[20px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+              className="theme-input w-full rounded-[20px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
           </div>
           <div className="space-y-1">
-            <label className="block text-sm font-bold text-[#35194f]">Email</label>
+            <label className="theme-heading block text-sm font-bold">Email</label>
             <input
               type="email"
               {...register("email")}
               autoComplete="off"
-              className="w-full rounded-[20px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+              className="theme-input w-full rounded-[20px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
           </div>
@@ -100,7 +100,7 @@ function MemberCard({ member }: { member: Member }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_16px_28px_rgba(176,23,120,0.2)] transition hover:-translate-y-0.5 disabled:opacity-60"
+              className="theme-brand-button rounded-full px-4 py-2.5 text-sm font-semibold transition hover:-translate-y-0.5 disabled:opacity-60"
             >
               {isSubmitting ? "Saving..." : "Save"}
             </button>
@@ -111,7 +111,7 @@ function MemberCard({ member }: { member: Member }) {
                 setActionError(null);
                 setIsEditing(false);
               }}
-              className="rounded-full border border-fuchsia-900/12 bg-white px-4 py-2.5 text-sm font-medium text-[#5f4b73] transition hover:bg-fuchsia-50"
+              className="theme-button-secondary rounded-full border px-4 py-2.5 text-sm font-medium transition hover:bg-white/80"
             >
               Cancel
             </button>
@@ -122,17 +122,17 @@ function MemberCard({ member }: { member: Member }) {
   }
 
   return (
-    <li className="rounded-[24px] border border-fuchsia-900/10 bg-white/88 p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
+    <li className="theme-card rounded-[24px] border p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-lg font-extrabold tracking-[-0.02em] text-[#2f143f]">{member.name}</p>
-          {member.email && <p className="text-[#6a567b]">{member.email}</p>}
+          <p className="theme-heading text-lg font-extrabold tracking-[-0.02em]">{member.name}</p>
+          {member.email && <p className="theme-muted">{member.email}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="rounded-full border border-fuchsia-900/12 bg-[linear-gradient(135deg,#f4e4fb,#ffffff)] px-4 py-2.5 text-sm font-semibold text-[#5c2673] shadow-[0_12px_24px_rgba(118,60,145,0.1)] transition hover:-translate-y-0.5"
+            className="theme-button-secondary rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_12px_24px_rgba(118,60,145,0.1)] transition hover:-translate-y-0.5"
           >
             Edit
           </button>
@@ -154,7 +154,7 @@ function MemberCard({ member }: { member: Member }) {
 export function ManageMembersList({ members }: ManageMembersListProps) {
   return (
     <ul className="mt-3 space-y-2 text-sm">
-      {members.length === 0 && <li className="text-[#6a567b]">No members added yet.</li>}
+      {members.length === 0 && <li className="theme-muted">No members added yet.</li>}
       {members.map((member) => (
         <MemberCard key={member.id} member={member} />
       ))}

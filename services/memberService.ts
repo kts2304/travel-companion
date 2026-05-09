@@ -9,6 +9,7 @@ export async function addMember(tripId: string, input: AddMemberInput): Promise<
       trip_id: tripId,
       name: normalizedName,
       email: input.email?.trim() || null,
+      auth_user_id: input.authUserId ?? null,
     })
     .select("*")
     .single();
@@ -44,6 +45,7 @@ export async function updateMember(memberId: string, input: UpdateMemberInput): 
     .update({
       name: normalizedName,
       email: input.email?.trim() || null,
+      auth_user_id: input.authUserId ?? undefined,
     })
     .eq("id", memberId)
     .select("*")
@@ -68,4 +70,21 @@ export async function deleteMember(memberId: string): Promise<void> {
     }
     throw new Error(error.message);
   }
+}
+
+export async function linkMemberToAuthUser(memberId: string, authUserId: string): Promise<Member> {
+  const { data, error } = await supabase
+    .from("members")
+    .update({
+      auth_user_id: authUserId,
+    })
+    .eq("id", memberId)
+    .select("*")
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as Member;
 }

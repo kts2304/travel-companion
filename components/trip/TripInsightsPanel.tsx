@@ -32,8 +32,8 @@ export function TripInsightsPanel({
 }: TripInsightsPanelProps) {
   return (
     <aside className="space-y-4">
-      <section className="travel-card-hover relative overflow-hidden rounded-[32px] border border-white/75 bg-[linear-gradient(180deg,rgba(72,21,104,0.94),rgba(95,23,120,0.94))] p-5 shadow-[0_24px_40px_rgba(118,60,145,0.14)]">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden text-fuchsia-100/10">
+      <section className="travel-card-hover theme-strong-surface relative overflow-hidden rounded-[32px] border p-5 shadow-[0_24px_40px_rgba(118,60,145,0.14)]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden text-white/10">
           <div className="absolute -right-6 top-2 h-24 w-24 rounded-full bg-current blur-3xl" />
           <svg viewBox="0 0 240 120" className="absolute right-4 top-8 h-24 w-44" fill="none" stroke="currentColor" strokeWidth="3">
             <path d="M20 88h180" />
@@ -73,8 +73,8 @@ export function TripInsightsPanel({
         </div>
       </section>
 
-      <section className="travel-card-hover relative overflow-hidden rounded-[32px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,239,250,0.9))] p-5 shadow-[0_24px_40px_rgba(118,60,145,0.12)]">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden text-fuchsia-700/8">
+      <section className="travel-card-hover theme-card relative overflow-hidden rounded-[32px] border p-5 shadow-[0_24px_40px_rgba(118,60,145,0.12)]">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden text-[color:var(--accent-text-soft)]/10">
           <svg viewBox="0 0 220 120" className="absolute right-2 top-4 h-24 w-40" fill="none" stroke="currentColor" strokeWidth="3">
             <path d="M28 80c18-18 34-24 52-24 20 0 34 8 50 22 18 16 34 24 58 24" />
             <circle cx="28" cy="80" r="6" />
@@ -83,21 +83,21 @@ export function TripInsightsPanel({
         </div>
         <div className="relative z-10">
         <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-fuchsia-900/10 bg-fuchsia-50 text-fuchsia-800">
+          <span className="theme-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-2xl border">
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M4 12h16M14 6l6 6-6 6" />
             </svg>
           </span>
-          <h2 className="text-lg font-semibold tracking-[-0.02em] text-[#35194f]">Overall Settlements</h2>
+          <h2 className="theme-heading text-lg font-semibold tracking-[-0.02em]">Overall Settlements</h2>
         </div>
         <div className="mt-4 space-y-2">
           {settlements.length === 0 && (
-            <p className="text-sm text-[#6c567f]">No outstanding balances.</p>
+            <p className="theme-muted text-sm">No outstanding balances.</p>
           )}
           {settlements.map((settlement, index) => (
             <p
               key={`${settlement.fromMemberId}-${settlement.toMemberId}-${index}`}
-              className="rounded-2xl border border-fuchsia-900/8 bg-white/78 px-3 py-2.5 text-sm text-[#5a4670]"
+              className="theme-button-secondary rounded-2xl border px-3 py-2.5 text-sm"
             >
               {memberLabelById.get(settlement.fromMemberId) ?? settlement.fromMemberName} owes{" "}
               {memberLabelById.get(settlement.toMemberId) ?? settlement.toMemberName} Rs{" "}
@@ -108,7 +108,7 @@ export function TripInsightsPanel({
         </div>
       </section>
 
-      <section className="travel-card-hover relative overflow-hidden rounded-[32px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,239,250,0.9))] p-5 shadow-[0_24px_40px_rgba(118,60,145,0.12)]">
+      <section className="travel-card-hover theme-card relative overflow-hidden rounded-[32px] border p-5 shadow-[0_24px_40px_rgba(118,60,145,0.12)]">
         <div className="pointer-events-none absolute inset-0 overflow-hidden text-amber-500/8">
           <svg viewBox="0 0 240 140" className="absolute right-0 top-2 h-28 w-48" fill="none" stroke="currentColor" strokeWidth="3">
             <rect x="46" y="26" width="126" height="94" rx="18" />
@@ -117,29 +117,29 @@ export function TripInsightsPanel({
         </div>
         <div className="relative z-10">
         <div className="flex items-center gap-3">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300/30 bg-amber-50 text-amber-700">
+          <span className="theme-button-secondary inline-flex h-10 w-10 items-center justify-center rounded-2xl border">
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
               <rect x="4" y="5" width="16" height="15" rx="2" />
               <path d="M8 3v4M16 3v4M4 9h16" />
             </svg>
           </span>
-          <h2 className="text-lg font-semibold tracking-[-0.02em] text-[#35194f]">Day-wise</h2>
+          <h2 className="theme-heading text-lg font-semibold tracking-[-0.02em]">Day-wise</h2>
         </div>
         <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pr-1">
           {dayWiseSummaries.length === 0 && (
-            <p className="text-sm text-[#6c567f]">No expenses added yet.</p>
+            <p className="theme-muted text-sm">No expenses added yet.</p>
           )}
           {dayWiseSummaries.map((summary) => (
             <div
               key={summary.date}
-              className="rounded-[26px] border border-fuchsia-900/8 bg-white/78 p-4"
+              className="theme-button-secondary rounded-[26px] border p-4"
             >
-              <p className="text-sm font-semibold text-[#35194f]">{summary.date}</p>
+              <p className="theme-heading text-sm font-semibold">{summary.date}</p>
               <div className="mt-2 space-y-2">
                 {summary.memberBalances.map((memberBalance) => (
                   <p
                     key={`${summary.date}-${memberBalance.memberId}`}
-                    className="text-xs leading-5 text-[#6c567f]"
+                    className="theme-muted text-xs leading-5"
                   >
                     {memberBalance.memberName}: Net Rs {memberBalance.balance.toFixed(2)}
                   </p>

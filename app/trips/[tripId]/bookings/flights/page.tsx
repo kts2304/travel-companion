@@ -73,21 +73,21 @@ export default async function FlightsTransportPage({ params }: FlightsTransportP
         <div className="space-y-6">
           <MyTravelPanel members={members} personalBookings={personalBookings} />
 
-          <section className="travel-card-hover rounded-[28px] border border-fuchsia-400/18 bg-[linear-gradient(180deg,rgba(65,24,95,0.92),rgba(20,14,40,0.96))] p-5 shadow-[0_22px_60px_rgba(61,18,89,0.22)]">
+          <section className="travel-card-hover theme-strong-surface rounded-[28px] border p-5 shadow-[0_22px_60px_rgba(61,18,89,0.22)]">
             <div className="flex items-center gap-3">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-fuchsia-200/16 bg-white/8 text-fuchsia-100">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/16 bg-white/8 text-white">
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <path d="M4 15h16M6 15V9h12v6M8 19v-4M16 19v-4M7 11h2m6 0h2" />
                 </svg>
               </span>
               <h2 className="text-lg font-semibold text-white">Shared Transport</h2>
             </div>
-            <p className="mt-2 text-sm text-fuchsia-100/78">
+            <p className="mt-2 text-sm text-white/74">
               Cabs, airport pickups, and local transport details that belong to the whole trip.
             </p>
             <div className="mt-4 space-y-3">
               {sharedTransportBookings.length === 0 && (
-                <p className="text-sm text-fuchsia-100/72">No shared transport bookings added yet.</p>
+                <p className="text-sm text-white/72">No shared transport bookings added yet.</p>
               )}
               {sharedTransportBookings.map(({ booking, documents }) => (
                 <div

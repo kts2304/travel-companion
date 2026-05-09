@@ -14,11 +14,16 @@ create table if not exists members (
   trip_id uuid not null references trips(id) on delete cascade,
   name text not null,
   email text,
+  auth_user_id uuid,
   created_at timestamptz not null default now()
 );
 
 create unique index if not exists members_trip_id_name_unique
 on members (trip_id, lower(trim(name)));
+
+create unique index if not exists members_trip_id_auth_user_unique
+on members (trip_id, auth_user_id)
+where auth_user_id is not null;
 
 create table if not exists expenses (
   id uuid primary key default gen_random_uuid(),

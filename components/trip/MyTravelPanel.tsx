@@ -2,9 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  findTripMemberForAuthUser,
+  shouldLinkTripMemberOwnership,
+} from "@/lib/auth/resolveTripMember";
 import { BookingDocumentsPanel } from "@/components/trip/BookingDocumentsPanel";
 import { DeleteBookingButton } from "@/components/trip/DeleteBookingButton";
 import { getCurrentAuthUser } from "@/services/authService";
+import { linkMemberToAuthUser } from "@/services/memberService";
 import type { Booking, BookingDocument } from "@/types/booking";
 import type { Member } from "@/types/member";
 
@@ -111,6 +116,7 @@ function JourneyCard({
 }
 
 export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps) {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
@@ -123,6 +129,7 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
         return;
       }
 
+      setCurrentUserId(user?.id ?? null);
       setCurrentEmail(user?.email ?? null);
       setIsLoadingUser(false);
     }
@@ -135,16 +142,47 @@ export function MyTravelPanel({ members, personalBookings }: MyTravelPanelProps)
   }, []);
 
   const currentMember = useMemo(() => {
-    if (!currentEmail) {
+    if (!currentUserId && !currentEmail) {
       return null;
     }
 
-    return (
-      members.find(
-        (member) => member.email?.trim().toLowerCase() === currentEmail,
-      ) ?? null
-    );
-  }, [currentEmail, members]);
+    return findTripMemberForAuthUser(members, {
+      id: currentUserId ?? "",
+      email: currentEmail,
+    });
+  }, [currentEmail, currentUserId, members]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function linkOwnershipIfNeeded() {
+      const resolvedMember = currentMember;
+
+      if (
+        !currentUserId ||
+        !currentEmail ||
+        !resolvedMember ||
+        !shouldLinkTripMemberOwnership(resolvedMember, {
+          id: currentUserId,
+          email: currentEmail,
+        })
+      ) {
+        return;
+      }
+
+      try {
+        await linkMemberToAuthUser(resolvedMember.id, currentUserId);
+      } catch {
+        // Keep the email fallback working even if ownership linking fails.
+      }
+    }
+
+    void linkOwnershipIfNeeded();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentEmail, currentMember, currentUserId]);
 
   const myBookings = useMemo(() => {
     if (!currentMember) {

@@ -48,23 +48,23 @@ export function AddMemberForm({ tripId }: AddMemberFormProps) {
     <form
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
-      className="space-y-4 rounded-[28px] border border-fuchsia-900/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.96),rgba(248,239,250,0.92))] p-5 shadow-[0_20px_36px_rgba(118,60,145,0.12)]"
+      className="theme-card space-y-4 rounded-[28px] border p-5 shadow-[0_20px_36px_rgba(118,60,145,0.12)]"
     >
       <div className="space-y-1">
-        <label htmlFor="member-name" className="block text-sm font-bold text-[#35194f]">
+        <label htmlFor="member-name" className="theme-heading block text-sm font-bold">
           Member name
         </label>
         <input
           id="member-name"
           {...register("name")}
           autoComplete="off"
-          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+          className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
         />
         {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="member-email" className="block text-sm font-bold text-[#35194f]">
+        <label htmlFor="member-email" className="theme-heading block text-sm font-bold">
           Email (optional)
         </label>
         <input
@@ -72,7 +72,7 @@ export function AddMemberForm({ tripId }: AddMemberFormProps) {
           type="email"
           {...register("email")}
           autoComplete="off"
-          className="w-full rounded-[22px] border border-fuchsia-900/12 bg-white p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+          className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
         />
         {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
       </div>
@@ -82,7 +82,7 @@ export function AddMemberForm({ tripId }: AddMemberFormProps) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-5 py-3 font-semibold text-white shadow-[0_18px_34px_rgba(176,23,120,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(176,23,120,0.3)] disabled:opacity-60"
+        className="theme-brand-button rounded-full px-5 py-3 font-semibold transition hover:-translate-y-0.5 disabled:opacity-60"
       >
         {isSubmitting ? "Adding..." : "Add member"}
       </button>

@@ -45,9 +45,9 @@ export function BookingsHub({
 
   return (
     <div className="space-y-6">
-      <section className="rounded-[30px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,239,250,0.9))] p-5 shadow-[0_18px_34px_rgba(118,60,145,0.12)]">
-        <h3 className="text-xl font-black tracking-[-0.03em] text-[#35194f]">Bookings Hub</h3>
-        <p className="mt-2 text-sm leading-6 text-[#6c567f]">
+      <section className="theme-card rounded-[30px] border p-5 shadow-[0_18px_34px_rgba(118,60,145,0.12)]">
+        <h3 className="theme-heading text-xl font-black tracking-[-0.03em]">Bookings Hub</h3>
+        <p className="theme-muted mt-2 text-sm leading-6">
           Keep the overview clean here, then open the booking area you want to work on.
         </p>
       </section>

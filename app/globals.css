@@ -7,6 +7,59 @@
   --panel-border: rgba(111, 60, 138, 0.14);
   --accent: #c21884;
   --accent-soft: rgba(194, 24, 132, 0.12);
+  --shell-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(251, 244, 252, 0.9));
+  --card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 239, 250, 0.9));
+  --card-strong-bg: linear-gradient(180deg, rgba(72, 21, 104, 0.94), rgba(95, 23, 120, 0.94));
+  --input-bg: #ffffff;
+  --heading-color: #35194f;
+  --muted-color: #6c567f;
+  --border-color: rgba(255, 255, 255, 0.72);
+  --button-secondary-bg: rgba(255, 255, 255, 0.88);
+  --button-secondary-text: #5b3a76;
+  --tab-rail-bg: linear-gradient(180deg, rgba(72, 21, 104, 0.94), rgba(93, 23, 118, 0.94));
+  --tab-active-bg: #ffffff;
+  --tab-active-text: #7a1f8c;
+  --tab-idle-bg: rgba(255, 255, 255, 0.1);
+  --tab-idle-text: rgba(255, 255, 255, 0.84);
+  --brand-start: #c21884;
+  --brand-end: #8b1d8f;
+  --brand-shadow: rgba(176, 23, 120, 0.24);
+  --accent-dot: #c21884;
+  --accent-glow: rgba(176, 23, 120, 0.55);
+  --accent-text-strong: #a11a73;
+  --accent-text-soft: rgba(161, 26, 115, 0.7);
+  --accent-gradient-text: linear-gradient(90deg, #b01778 0%, #7c3aed 58%, #d946ef 100%);
+}
+
+html[data-theme="dark"] {
+  --background: #040a14;
+  --foreground: #f7fbff;
+  --panel: rgba(7, 18, 33, 0.78);
+  --panel-border: rgba(148, 163, 184, 0.16);
+  --accent: #4fd9ff;
+  --accent-soft: rgba(79, 217, 255, 0.14);
+  --shell-bg: linear-gradient(180deg, rgba(8, 18, 33, 0.95), rgba(6, 13, 24, 0.94));
+  --card-bg: linear-gradient(180deg, rgba(10, 21, 38, 0.94), rgba(6, 13, 24, 0.92));
+  --card-strong-bg: linear-gradient(180deg, rgba(16, 76, 92, 0.96), rgba(7, 46, 52, 0.98));
+  --input-bg: rgba(6, 17, 29, 0.96);
+  --heading-color: #f7fbff;
+  --muted-color: #b8c7d9;
+  --border-color: rgba(148, 163, 184, 0.18);
+  --button-secondary-bg: rgba(6, 17, 29, 0.84);
+  --button-secondary-text: #d8f5ff;
+  --tab-rail-bg: linear-gradient(180deg, rgba(8, 24, 41, 0.98), rgba(5, 15, 27, 0.98));
+  --tab-active-bg: rgba(79, 217, 255, 0.14);
+  --tab-active-text: #f7fbff;
+  --tab-idle-bg: rgba(255, 255, 255, 0.06);
+  --tab-idle-text: rgba(247, 251, 255, 0.78);
+  --brand-start: #16a4b8;
+  --brand-end: #145c52;
+  --brand-shadow: rgba(22, 164, 184, 0.22);
+  --accent-dot: #4fd9ff;
+  --accent-glow: rgba(79, 217, 255, 0.45);
+  --accent-text-strong: #97f1ff;
+  --accent-text-soft: rgba(151, 241, 255, 0.72);
+  --accent-gradient-text: linear-gradient(90deg, #78e8ff 0%, #2bd9ff 48%, #44d7b6 100%);
 }
 
 @theme inline {
@@ -31,6 +84,40 @@ body {
     radial-gradient(circle at 18% 92%, rgba(255, 255, 255, 0.44), transparent 20%),
     linear-gradient(180deg, #eec8eb 0%, #e7c0ea 40%, #ddb4e3 100%);
   min-height: 100vh;
+}
+
+html[data-theme="dark"] body {
+  background-image:
+    radial-gradient(circle at 10% 8%, rgba(79, 217, 255, 0.18), transparent 20%),
+    radial-gradient(circle at 84% 12%, rgba(56, 189, 248, 0.14), transparent 22%),
+    radial-gradient(circle at 78% 64%, rgba(139, 92, 246, 0.08), transparent 18%),
+    radial-gradient(circle at 18% 92%, rgba(16, 185, 129, 0.08), transparent 20%),
+    linear-gradient(180deg, #030813 0%, #07111d 42%, #091522 100%);
+}
+
+html[data-theme="dark"] body::before {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  opacity: 0.22;
+}
+
+html[data-theme="dark"] ::selection {
+  background: rgba(79, 217, 255, 0.22);
+  color: #fff;
+}
+
+html[data-theme="dark"] * {
+  scrollbar-color: rgba(79, 217, 255, 0.38) rgba(7, 18, 33, 0.42);
+}
+
+html[data-theme="dark"] *::-webkit-scrollbar-track {
+  background: rgba(7, 18, 33, 0.42);
+}
+
+html[data-theme="dark"] *::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(79, 217, 255, 0.62), rgba(56, 189, 248, 0.24));
+  border: 2px solid rgba(7, 18, 33, 0.42);
 }
 
 body::before {
@@ -125,4 +212,89 @@ input[type="number"]::-webkit-inner-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
   appearance: textfield;
+}
+
+.theme-shell {
+  background: var(--shell-bg);
+  border-color: var(--border-color);
+}
+
+.theme-card {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.theme-card-strong {
+  background: var(--card-strong-bg);
+  border-color: var(--border-color);
+}
+
+.theme-heading {
+  color: var(--heading-color);
+}
+
+.theme-muted {
+  color: var(--muted-color);
+}
+
+.theme-input {
+  background: var(--input-bg);
+  color: var(--heading-color);
+  border-color: color-mix(in srgb, var(--border-color) 85%, transparent);
+}
+
+.theme-button-secondary {
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+  border-color: color-mix(in srgb, var(--border-color) 95%, transparent);
+}
+
+.theme-tab-rail {
+  background: var(--tab-rail-bg);
+}
+
+.theme-tab-active {
+  background: var(--tab-active-bg);
+  color: var(--tab-active-text);
+}
+
+.theme-tab-idle {
+  background: var(--tab-idle-bg);
+  color: var(--tab-idle-text);
+}
+
+.theme-brand-button {
+  background: linear-gradient(135deg, var(--brand-start), var(--brand-end));
+  color: #fff;
+  box-shadow: 0 18px 34px var(--brand-shadow);
+}
+
+.theme-brand-button:hover {
+  box-shadow: 0 24px 42px var(--brand-shadow);
+}
+
+.theme-strong-surface {
+  background: var(--card-strong-bg);
+  color: var(--foreground);
+  border-color: var(--border-color);
+}
+
+.theme-accent-dot {
+  background: var(--accent-dot);
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+
+.theme-accent-soft-text {
+  color: var(--accent-text-soft);
+}
+
+.theme-accent-strong-text {
+  color: var(--accent-text-strong);
+}
+
+.theme-gradient-text {
+  background: var(--accent-gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

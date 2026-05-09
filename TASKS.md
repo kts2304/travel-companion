@@ -4,7 +4,7 @@
 - Create trips
 - Add members to trips
 - Add expenses
-- Split expenses equally
+- Split expenses equally    
 - Display balances
 
 ## V2 (In Progress)

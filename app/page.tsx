@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-4 sm:px-6 xl:px-8">
       <div className="mx-auto max-w-[1500px]">
-        <section className="relative overflow-hidden rounded-[40px] border border-white/60 bg-[linear-gradient(180deg,rgba(255,255,255,0.86),rgba(255,255,255,0.74))] px-6 py-6 shadow-[0_26px_60px_rgba(118,60,145,0.18)] backdrop-blur">
+        <section className="theme-shell relative overflow-hidden rounded-[40px] border px-6 py-6 shadow-[0_26px_60px_rgba(118,60,145,0.18)] backdrop-blur">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 overflow-hidden text-fuchsia-700/10"
@@ -39,66 +39,66 @@ export default function Home() {
           </div>
           <div className="grid gap-6 xl:grid-cols-[1.06fr_0.94fr] xl:items-start">
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-3 rounded-full border border-fuchsia-900/10 bg-white/70 px-4 py-2 shadow-[0_10px_24px_rgba(118,60,145,0.08)]">
-                <span className="h-2.5 w-2.5 rounded-full bg-fuchsia-600 shadow-[0_0_18px_rgba(176,23,120,0.55)]" />
-                <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-fuchsia-900/80">
+              <div className="theme-button-secondary inline-flex items-center gap-3 rounded-full border px-4 py-2 shadow-[0_10px_24px_rgba(118,60,145,0.08)]">
+                <span className="theme-accent-dot h-2.5 w-2.5 rounded-full" />
+                <p className="theme-heading text-[11px] font-semibold uppercase tracking-[0.32em]">
                   Travel Companion Workspace
                 </p>
               </div>
-              <h1 className="mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.05em] text-[#35194f] sm:text-5xl xl:text-[3.4rem]">
+              <h1 className="theme-heading mt-5 max-w-3xl text-4xl font-semibold tracking-[-0.05em] sm:text-5xl xl:text-[3.4rem]">
                 One trip hub for expenses,
-                <span className="bg-[linear-gradient(90deg,#b01778_0%,#7c3aed_58%,#d946ef_100%)] bg-clip-text text-transparent">
+                <span className="theme-gradient-text">
                   {" "}members, bookings,
                 </span>
                 <br />
                 and personal travel.
               </h1>
-              <p className="mt-4 max-w-2xl text-base leading-7 text-[#5a4670]">
+              <p className="theme-muted mt-4 max-w-2xl text-base leading-7">
                 Plan with your group, keep the settlement picture clear, and move from shared
                 logistics to traveler-specific tickets without jumping across tools.
               </p>
 
-              <div className="mt-6 rounded-full border border-fuchsia-900/10 bg-white/70 px-5 py-3 text-sm text-[#5a4670] shadow-[0_10px_24px_rgba(118,60,145,0.08)]">
+              <div className="theme-button-secondary mt-6 rounded-full border px-5 py-3 text-sm shadow-[0_10px_24px_rgba(118,60,145,0.08)]">
                 Shared planning + personal travel in one flow
               </div>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                <div className="travel-card-hover rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(72,21,104,0.92),rgba(95,23,120,0.92))] p-4 text-white shadow-[0_16px_28px_rgba(118,60,145,0.16)]">
+                <div className="travel-card-hover theme-strong-surface rounded-[28px] border p-4 shadow-[0_16px_28px_rgba(118,60,145,0.16)]">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">Flow</p>
                   <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-white">One workspace</p>
                 </div>
-                <div className="travel-card-hover rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,239,250,0.9))] p-4 text-[#35194f] shadow-[0_16px_28px_rgba(118,60,145,0.1)]">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-fuchsia-900/60">Clarity</p>
-                  <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#35194f]">Day-wise nets</p>
+                <div className="travel-card-hover theme-card rounded-[28px] border p-4 text-[var(--heading-color)] shadow-[0_16px_28px_rgba(118,60,145,0.1)]">
+                  <p className="theme-accent-soft-text text-[11px] font-semibold uppercase tracking-[0.22em]">Clarity</p>
+                  <p className="theme-heading mt-2 text-xl font-semibold tracking-[-0.03em]">Day-wise nets</p>
                 </div>
-                <div className="travel-card-hover rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(248,239,250,0.9))] p-4 text-[#35194f] shadow-[0_16px_28px_rgba(118,60,145,0.1)]">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-fuchsia-900/60">Travel kit</p>
-                  <p className="mt-2 text-xl font-semibold tracking-[-0.03em] text-[#35194f]">Personal tickets</p>
+                <div className="travel-card-hover theme-card rounded-[28px] border p-4 text-[var(--heading-color)] shadow-[0_16px_28px_rgba(118,60,145,0.1)]">
+                  <p className="theme-accent-soft-text text-[11px] font-semibold uppercase tracking-[0.22em]">Travel kit</p>
+                  <p className="theme-heading mt-2 text-xl font-semibold tracking-[-0.03em]">Personal tickets</p>
                 </div>
               </div>
             </div>
 
             <div className="relative z-10 space-y-4">
-              <section className="travel-card-hover rounded-[32px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,239,250,0.9))] p-4 shadow-[0_18px_34px_rgba(118,60,145,0.12)]">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-fuchsia-900/60">
+              <section className="travel-card-hover theme-card rounded-[32px] border p-4 shadow-[0_18px_34px_rgba(118,60,145,0.12)]">
+                <p className="theme-muted text-xs font-semibold uppercase tracking-[0.24em]">
                   Launch
                 </p>
-                <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-[#35194f]">
+                <h2 className="theme-heading mt-2 text-2xl font-black tracking-[-0.03em]">
                   Sign in and start your tour
                 </h2>
-                <p className="mt-2 text-sm leading-6 text-[#6c567f]">
+                <p className="theme-muted mt-2 text-sm leading-6">
                   Open your workspace and start planning faster.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link
                     href="/trips/create"
-                    className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-7 py-3.5 font-semibold text-white shadow-[0_18px_40px_rgba(176,23,120,0.3)] hover:-translate-y-0.5 hover:shadow-[0_24px_48px_rgba(176,23,120,0.36)]"
+                    className="theme-brand-button rounded-full px-7 py-3.5 font-semibold transition hover:-translate-y-0.5"
                   >
                     Start a trip
                   </Link>
                   <Link
                     href="/trips/create"
-                    className="rounded-full border border-fuchsia-900/10 bg-white px-6 py-3.5 text-sm font-semibold text-[#5a4670] shadow-[0_10px_24px_rgba(118,60,145,0.08)] hover:-translate-y-0.5"
+                    className="theme-button-secondary rounded-full border px-6 py-3.5 text-sm font-semibold shadow-[0_10px_24px_rgba(118,60,145,0.08)] hover:-translate-y-0.5"
                   >
                     Start tour
                   </Link>

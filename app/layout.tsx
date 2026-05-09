@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
+
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,8 +15,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">{children}</body>
+    <html lang="en" data-theme="light" suppressHydrationWarning>
+      <body className="antialiased">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`
+            try {
+              var theme = localStorage.getItem('travel-companion-theme');
+              document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light';
+            } catch (e) {
+              document.documentElement.dataset.theme = 'light';
+            }
+          `}
+        </Script>
+        <ThemeToggle />
+        {children}
+      </body>
     </html>
   );
 }

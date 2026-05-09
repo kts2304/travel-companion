@@ -6,7 +6,7 @@ export default function CreateTripPage() {
   return (
     <main className="min-h-screen px-4 py-6 sm:px-6 xl:px-8">
       <div className="mx-auto max-w-[1100px]">
-        <div className="relative overflow-hidden rounded-[36px] border border-white/70 bg-[linear-gradient(180deg,rgba(255,255,255,0.9),rgba(249,240,251,0.84))] p-6 shadow-[0_30px_60px_rgba(118,60,145,0.16)] backdrop-blur sm:p-8">
+        <div className="theme-shell relative overflow-hidden rounded-[36px] border p-6 shadow-[0_30px_60px_rgba(118,60,145,0.16)] backdrop-blur sm:p-8">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 overflow-hidden text-fuchsia-700/10"
@@ -27,13 +27,13 @@ export default function CreateTripPage() {
             </svg>
           </div>
           <div className="relative z-10 max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-900/60">
+            <p className="theme-muted text-xs font-semibold uppercase tracking-[0.28em]">
               New Trip Workspace
             </p>
-            <h1 className="mt-4 text-3xl font-black tracking-[-0.04em] text-[#35194f] sm:text-4xl">
+            <h1 className="theme-heading mt-4 text-3xl font-black tracking-[-0.04em] sm:text-4xl">
               Create Trip
             </h1>
-            <p className="mt-2 text-sm leading-6 text-[#6c567f]">
+            <p className="theme-muted mt-2 text-sm leading-6">
               Set the trip basics once. We&apos;ll create the trip shell and add you as the first
               member automatically.
             </p>
@@ -45,7 +45,7 @@ export default function CreateTripPage() {
 
           <Link
             href="/"
-            className="relative z-10 mt-6 inline-flex items-center rounded-full border border-fuchsia-900/10 bg-white/72 px-5 py-2.5 text-sm font-medium text-[#5b3a76] shadow-[0_10px_24px_rgba(118,60,145,0.08)] transition hover:-translate-y-0.5"
+            className="theme-button-secondary relative z-10 mt-6 inline-flex items-center rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_10px_24px_rgba(118,60,145,0.08)] transition hover:-translate-y-0.5"
           >
             Back to home
           </Link>

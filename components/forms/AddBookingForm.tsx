@@ -6,9 +6,14 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import {
+  findTripMemberForAuthUser,
+  shouldLinkTripMemberOwnership,
+} from "@/lib/auth/resolveTripMember";
 import { extractBookingDetailsFromFile } from "@/lib/bookings/extractBookingDetails";
 import { getCurrentAuthUser } from "@/services/authService";
 import { createBooking, uploadBookingDocument } from "@/services/bookingService";
+import { linkMemberToAuthUser } from "@/services/memberService";
 import type { BookingType } from "@/types/booking";
 import type { Member } from "@/types/member";
 
@@ -99,6 +104,7 @@ export function AddBookingForm({
   const [selectedDocument, setSelectedDocument] = useState<File | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractSuccess, setExtractSuccess] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [currentEmail, setCurrentEmail] = useState<string | null>(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
 
@@ -142,14 +148,15 @@ export function AddBookingForm({
   const isPersonalBooking = personalBookingTypes.includes(selectedType);
   const isHotelBooking = selectedType === "hotel";
   const currentMember = useMemo(() => {
-    if (!currentEmail) {
+    if (!currentUserId && !currentEmail) {
       return null;
     }
 
-    return (
-      members.find((member) => member.email?.trim().toLowerCase() === currentEmail) ?? null
-    );
-  }, [currentEmail, members]);
+    return findTripMemberForAuthUser(members, {
+      id: currentUserId ?? "",
+      email: currentEmail,
+    });
+  }, [currentEmail, currentUserId, members]);
 
   useEffect(() => {
     let isMounted = true;
@@ -160,6 +167,7 @@ export function AddBookingForm({
         return;
       }
 
+      setCurrentUserId(user?.id ?? null);
       setCurrentEmail(user?.email ?? null);
       setIsLoadingUser(false);
     }
@@ -170,6 +178,41 @@ export function AddBookingForm({
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function linkOwnershipIfNeeded() {
+      const resolvedMember = currentMember;
+
+      if (
+        !currentUserId ||
+        !currentEmail ||
+        !resolvedMember ||
+        !shouldLinkTripMemberOwnership(resolvedMember, {
+          id: currentUserId,
+          email: currentEmail,
+        })
+      ) {
+        return;
+      }
+
+      try {
+        await linkMemberToAuthUser(resolvedMember.id, currentUserId);
+        if (isMounted) {
+          router.refresh();
+        }
+        } catch {
+        // Keep the email fallback working even if ownership linking fails.
+      }
+    }
+
+    void linkOwnershipIfNeeded();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentEmail, currentMember, currentUserId, router]);
 
   useEffect(() => {
     if (isPersonalBooking && currentMember) {
@@ -355,9 +398,9 @@ export function AddBookingForm({
     <form
       onSubmit={handleSubmit(onSubmit)}
       autoComplete="off"
-      className="space-y-4 rounded-[32px] border border-white/75 bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,239,250,0.9))] p-5 shadow-[0_20px_34px_rgba(118,60,145,0.14)]"
+      className="theme-card space-y-4 rounded-[32px] border p-5 shadow-[0_20px_34px_rgba(118,60,145,0.14)]"
     >
-      <div className="rounded-[28px] border border-white/70 bg-[linear-gradient(180deg,rgba(72,21,104,0.92),rgba(95,23,120,0.92))] p-4 shadow-[0_16px_30px_rgba(118,60,145,0.16)]">
+      <div className="theme-card-strong rounded-[28px] border p-4 shadow-[0_16px_30px_rgba(118,60,145,0.16)]">
         <p className="text-sm font-medium text-white">{heading}</p>
         <p className="mt-1 text-xs text-white/78">
           {description}
@@ -365,7 +408,7 @@ export function AddBookingForm({
         <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
           <label
             htmlFor={fileInputId}
-            className="inline-flex shrink-0 cursor-pointer items-center rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-fuchsia-900 shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5"
+            className="theme-button-secondary inline-flex shrink-0 cursor-pointer items-center rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5"
           >
             Choose file
           </label>
@@ -388,7 +431,7 @@ export function AddBookingForm({
             type="button"
             onClick={onExtract}
             disabled={isExtracting}
-            className="shrink-0 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-fuchsia-900 shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5 disabled:opacity-60"
+            className="theme-button-secondary shrink-0 rounded-full border px-4 py-2.5 text-sm font-semibold shadow-[0_16px_28px_rgba(39,4,58,0.14)] transition hover:-translate-y-0.5 disabled:opacity-60"
           >
             {isExtracting ? "Extracting..." : "Extract details"}
           </button>
@@ -397,14 +440,14 @@ export function AddBookingForm({
       </div>
 
       <div className="space-y-1">
-        <label htmlFor="booking-type" className="block text-sm font-medium text-[#35194f]">
+        <label htmlFor="booking-type" className="theme-heading block text-sm font-medium">
           Booking type
         </label>
         <select
           id="booking-type"
           {...register("type")}
           autoComplete="off"
-          className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+          className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
         >
           {availableTypes.map((type) => (
             <option key={type} value={type}>
@@ -415,7 +458,7 @@ export function AddBookingForm({
         {errors.type && <p className="text-sm text-red-600">{errors.type.message}</p>}
       </div>
 
-      <div className="rounded-[24px] border border-white/70 bg-white/82 px-4 py-3 text-sm text-[#5a4670]">
+      <div className="theme-card rounded-[24px] border px-4 py-3 text-sm theme-muted">
         {isPersonalBooking ? (
           <p>
             {selectedType === "flight" ? "Flight tickets" : "Bus tickets"} are stored as
@@ -428,26 +471,26 @@ export function AddBookingForm({
 
       {isPersonalBooking && (
         <div className="space-y-1">
-          <label className="block text-sm font-medium text-[#35194f]">Traveler</label>
+          <label className="theme-heading block text-sm font-medium">Traveler</label>
           {isLoadingUser ? (
-            <div className="rounded-[22px] border border-white/70 bg-white/92 px-4 py-3 text-sm text-[#6c567f]">
+            <div className="theme-input rounded-[22px] border px-4 py-3 text-sm">
               Checking signed-in traveler...
             </div>
           ) : currentMember ? (
-            <div className="rounded-[22px] border border-white/70 bg-[linear-gradient(180deg,rgba(72,21,104,0.92),rgba(95,23,120,0.92))] px-4 py-3 text-sm text-white">
+            <div className="theme-card-strong rounded-[22px] border px-4 py-3 text-sm text-white">
               {currentMember.name}
               {currentMember.email ? ` (${currentMember.email})` : ""}
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="rounded-[22px] border border-white/70 bg-white/92 px-4 py-3 text-sm text-[#7a5d2a]">
+              <div className="theme-card rounded-[22px] border px-4 py-3 text-sm theme-muted">
                 No signed-in trip member match found. Select the traveler manually for now.
               </div>
               <select
                 id="booking-member"
                 {...register("memberId")}
                 autoComplete="off"
-                className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+                className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
               >
                 <option value="">Select traveler</option>
                 {members.map((member) => (
@@ -466,7 +509,7 @@ export function AddBookingForm({
       {isHotelBooking ? null : isPersonalBooking ? null : (
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1">
-            <label htmlFor="booking-start" className="block text-sm font-bold text-[#35194f]">
+            <label htmlFor="booking-start" className="theme-heading block text-sm font-bold">
               Start date
             </label>
             <input
@@ -474,13 +517,13 @@ export function AddBookingForm({
               type="datetime-local"
               {...register("startDate")}
               autoComplete="off"
-              className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+              className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
             />
             {errors.startDate && <p className="text-sm text-red-600">{errors.startDate.message}</p>}
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="booking-end" className="block text-sm font-bold text-[#35194f]">
+            <label htmlFor="booking-end" className="theme-heading block text-sm font-bold">
               End date
             </label>
             <input
@@ -488,7 +531,7 @@ export function AddBookingForm({
               type="datetime-local"
               {...register("endDate")}
               autoComplete="off"
-              className="w-full rounded-[22px] border border-white/70 bg-white/92 p-3 text-[#35194f] outline-none ring-fuchsia-300 focus:ring-2"
+              className="theme-input w-full rounded-[22px] border p-3 outline-none ring-fuchsia-300 focus:ring-2"
             />
           </div>
         </div>
@@ -515,7 +558,7 @@ export function AddBookingForm({
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded-full bg-[linear-gradient(135deg,#c21884,#8b1d8f)] px-6 py-3 font-semibold text-white shadow-[0_18px_34px_rgba(176,23,120,0.24)] transition hover:-translate-y-0.5 hover:shadow-[0_24px_42px_rgba(176,23,120,0.3)] disabled:opacity-60"
+        className="theme-brand-button rounded-full px-6 py-3 font-semibold transition hover:-translate-y-0.5 disabled:opacity-60"
       >
         {isSubmitting ? "Adding..." : "Add booking"}
       </button>

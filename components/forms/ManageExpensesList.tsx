@@ -107,25 +107,25 @@ function ExpenseListItem({ expense, members, splitMemberIds }: ExpenseListItemPr
 
   if (!isEditing) {
     return (
-      <li className="rounded-xl border border-amber-200 bg-amber-50/80 p-3">
-        <p className="font-medium text-slate-900">{expense.description}</p>
-        <p className="text-slate-700">Date: {expense.expense_date}</p>
-        <p className="text-slate-700">Amount: Rs {expense.total_amount.toFixed(2)}</p>
-        <p className="text-slate-700">
+      <li className="theme-card rounded-[24px] border p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
+        <p className="theme-heading font-semibold">{expense.description}</p>
+        <p className="theme-muted">Date: {expense.expense_date}</p>
+        <p className="theme-muted">Amount: Rs {expense.total_amount.toFixed(2)}</p>
+        <p className="theme-muted">
           Paid by: {memberNameMap.get(expense.paid_by_member_id) ?? "Unknown member"}
         </p>
         <div className="mt-3 flex gap-2">
           <button
             type="button"
             onClick={() => setIsEditing(true)}
-            className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white"
+            className="theme-brand-button rounded-full px-4 py-2.5 text-xs font-semibold"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={onDelete}
-            className="rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white"
+            className="rounded-full border border-rose-300/60 bg-[linear-gradient(135deg,#fff1f5,#ffe2ea)] px-4 py-2.5 text-xs font-semibold text-rose-700 shadow-[0_12px_24px_rgba(225,29,72,0.08)] transition hover:-translate-y-0.5"
           >
             Delete
           </button>
@@ -136,23 +136,23 @@ function ExpenseListItem({ expense, members, splitMemberIds }: ExpenseListItemPr
   }
 
   return (
-    <li className="rounded-xl border border-sky-200 bg-sky-50/80 p-3">
+    <li className="theme-card rounded-[24px] border p-4 shadow-[0_14px_26px_rgba(118,60,145,0.08)]">
       <form onSubmit={handleSubmit(onUpdate)} className="space-y-3">
         <div className="space-y-1">
-          <label htmlFor={`edit-description-${expense.id}`} className="block text-sm font-medium">
+          <label htmlFor={`edit-description-${expense.id}`} className="theme-heading block text-sm font-medium">
             Description
           </label>
           <input
             id={`edit-description-${expense.id}`}
             {...register("description")}
-            className="w-full rounded-xl border border-slate-300 p-2 text-sm outline-none ring-sky-300 focus:ring-2"
+            className="theme-input w-full rounded-[20px] border p-2 text-sm outline-none ring-sky-300 focus:ring-2"
           />
           {errors.description && <p className="text-xs text-red-600">{errors.description.message}</p>}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="space-y-1">
-            <label htmlFor={`edit-total-${expense.id}`} className="block text-sm font-medium">
+            <label htmlFor={`edit-total-${expense.id}`} className="theme-heading block text-sm font-medium">
               Total amount
             </label>
             <input
@@ -161,33 +161,33 @@ function ExpenseListItem({ expense, members, splitMemberIds }: ExpenseListItemPr
               min="0"
               step="0.01"
               {...register("totalAmount", { valueAsNumber: true })}
-              className="w-full rounded-xl border border-slate-300 p-2 text-sm outline-none ring-sky-300 focus:ring-2"
+              className="theme-input w-full rounded-[20px] border p-2 text-sm outline-none ring-sky-300 focus:ring-2"
             />
             {errors.totalAmount && <p className="text-xs text-red-600">{errors.totalAmount.message}</p>}
           </div>
 
           <div className="space-y-1">
-            <label htmlFor={`edit-date-${expense.id}`} className="block text-sm font-medium">
+            <label htmlFor={`edit-date-${expense.id}`} className="theme-heading block text-sm font-medium">
               Expense date
             </label>
             <input
               id={`edit-date-${expense.id}`}
               type="date"
               {...register("expenseDate")}
-              className="w-full rounded-xl border border-slate-300 p-2 text-sm outline-none ring-sky-300 focus:ring-2"
+              className="theme-input w-full rounded-[20px] border p-2 text-sm outline-none ring-sky-300 focus:ring-2"
             />
             {errors.expenseDate && <p className="text-xs text-red-600">{errors.expenseDate.message}</p>}
           </div>
         </div>
 
         <div className="space-y-1">
-          <label htmlFor={`edit-paid-by-${expense.id}`} className="block text-sm font-medium">
+          <label htmlFor={`edit-paid-by-${expense.id}`} className="theme-heading block text-sm font-medium">
             Paid by
           </label>
           <select
             id={`edit-paid-by-${expense.id}`}
             {...register("paidByMemberId")}
-            className="w-full rounded-xl border border-slate-300 p-2 text-sm outline-none ring-sky-300 focus:ring-2"
+            className="theme-input w-full rounded-[20px] border p-2 text-sm outline-none ring-sky-300 focus:ring-2"
           >
             {members.map((member) => (
               <option key={member.id} value={member.id}>
@@ -199,13 +199,16 @@ function ExpenseListItem({ expense, members, splitMemberIds }: ExpenseListItemPr
         </div>
 
         <fieldset className="space-y-1">
-          <legend className="text-sm font-medium">Split among</legend>
-          <p className="text-xs text-slate-600">
+          <legend className="theme-heading text-sm font-medium">Split among</legend>
+          <p className="theme-muted text-xs">
             Payer is excluded automatically. Leave all unchecked for personal expense.
           </p>
           <div className="grid gap-1 sm:grid-cols-2">
             {members.map((member) => (
-              <label key={member.id} className="flex items-center gap-2 rounded-lg bg-white px-2 py-1 text-sm">
+              <label
+                key={member.id}
+                className="theme-button-secondary flex items-center gap-2 rounded-[18px] border px-2 py-1 text-sm"
+              >
                 <input
                   type="checkbox"
                   value={member.id}
@@ -225,14 +228,14 @@ function ExpenseListItem({ expense, members, splitMemberIds }: ExpenseListItemPr
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-60"
+            className="theme-brand-button rounded-full px-4 py-2.5 text-xs font-semibold disabled:opacity-60"
           >
             {isSubmitting ? "Saving..." : "Save"}
           </button>
           <button
             type="button"
             onClick={() => setIsEditing(false)}
-            className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
+            className="theme-button-secondary rounded-full border px-4 py-2.5 text-xs font-semibold"
           >
             Cancel
           </button>
@@ -258,7 +261,7 @@ export function ManageExpensesList({ expenses, members, expenseSplits }: ManageE
 
   return (
     <ul className="mt-3 space-y-2 text-sm">
-      {expenses.length === 0 && <li className="text-slate-600">No expenses added yet.</li>}
+      {expenses.length === 0 && <li className="theme-muted">No expenses added yet.</li>}
       {expenses.map((expense) => (
         <ExpenseListItem
           key={expense.id}
